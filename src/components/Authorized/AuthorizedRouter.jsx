@@ -5,6 +5,7 @@ import { Spin } from "antd";
 
 import { defaultRoutes } from "@conf/routes";
 import asyncComps from "@conf/asyncComps";
+import NotFound from "@pages/404";
 
 export default class AuthorizedRouter extends Component {
   static propTypes = {
@@ -34,7 +35,11 @@ export default class AuthorizedRouter extends Component {
           <Route
             key={commonPath}
             path={commonPath}
-            component={asyncComps[route.component]()}
+            component={
+              asyncComps[route.component]
+                ? asyncComps[route.component]()
+                : NotFound
+            }
             exact
           />
         );
