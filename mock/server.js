@@ -37,7 +37,7 @@ app.get("/admin/edu/subject/:page/:limit", (req, res, next) => {
 
   // 模拟数据 http://mockjs.com/examples.html
   const data = Mock.mock({
-    count: Random.integer(limit, limit * 2), // 以某个的范围取一个随机整数
+    total: Random.integer(+limit + 1, limit * 2), // 以某个的范围取一个随机整数
     // `items|${limit}` 生成数组，数组长度为limit
     [`items|${limit}`]: [
       {

@@ -4,19 +4,47 @@ import { Button, Table } from "antd";
 // 引入antd字体图标
 import { PlusOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons";
 
+import { reqGetSubjectList } from "@api/edu/subject";
+
 import "./index.less";
 
 export default class Subject extends Component {
+  state = {
+    subjects: {
+      total: 0,
+      items: [],
+    },
+  };
+
+  componentDidMount() {
+    // 代表一上来请求第一页数据
+    this.getSubjectList(1, 10);
+  }
+
+  // 获取subject分页列表数据
+  getSubjectList = async (page, limit) => {
+    // console.log(page, limit);
+    // 发送请求
+    const result = await reqGetSubjectList(page, limit);
+    // console.log(result);
+    // 更新数据
+    this.setState({
+      subjects: result,
+    });
+  };
+
   render() {
+    const { subjects } = this.state;
+
     const columns = [
       {
         // 表头显示的内容
         title: "分类名称",
         // 当前列要显示data中哪个数据（显示数据的key属性）
         // data[dataIndex]
-        dataIndex: "name",
+        dataIndex: "title",
         // 遍历元素需要唯一key属性
-        key: "age",
+        key: "title",
       },
       {
         title: "操作",
@@ -38,8 +66,8 @@ export default class Subject extends Component {
         ),
       },
     ];
-    
-    const data = [
+
+    /* const data = [
       {
         key: 1,
         name: "John Brown",
@@ -48,31 +76,7 @@ export default class Subject extends Component {
         description:
           "My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.",
       },
-      {
-        key: 2,
-        name: "Jim Green",
-        age: 42,
-        address: "London No. 1 Lake Park",
-        description:
-          "My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.",
-      },
-      {
-        key: 3,
-        name: "Not Expandable",
-        age: 29,
-        address: "Jiangsu No. 1 Lake Park",
-        description: "This not expandable",
-      },
-      {
-        key: 4,
-        name: "Joe Black",
-        age: 32,
-        address: "Sidney No. 1 Lake Park",
-        description:
-          "My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.",
-      },
-    ];
-
+    ];*/
     return (
       <div className="subject">
         <Button type="primary" className="subject-btn">
@@ -92,7 +96,16 @@ export default class Subject extends Component {
             // 返回值false 就是不可以展开
             rowExpandable: (record) => record.name !== "Not Expandable",
           }}
-          dataSource={data} // 决定每一行显示的数据
+          dataSource={subjects.items} // 决定每一行显示的数据
+          rowKey="_id" // 指定key属性的值是_id
+          pagination={{
+            total: subjects.total, // 数据总数
+            showQuickJumper: true, // 是否显示快速跳转
+            showSizeChanger: true, // 是否显示修改每页显示数量
+            pageSizeOptions: ["5", "10", "15", "20"],
+            defaultPageSize: 10,
+            onChange: this.getSubjectList, // 页码发生变化触发的回调
+          }}
         />
       </div>
     );
