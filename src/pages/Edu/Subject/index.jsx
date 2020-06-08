@@ -38,7 +38,7 @@ export default class Subject extends Component {
         ),
       },
     ];
-
+    
     const data = [
       {
         key: 1,
