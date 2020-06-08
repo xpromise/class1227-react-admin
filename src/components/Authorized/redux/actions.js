@@ -12,7 +12,7 @@ const getAccessRoutesSync = (menu) => ({
 export const getAccessRoutes = () => {
   return (dispatch) => {
     return getMenu().then((response) => {
-      dispatch(getAccessRoutesSync(response.permissionList));
+      dispatch(getAccessRoutesSync(response ? response.permissionList : {}));
     });
   };
 };

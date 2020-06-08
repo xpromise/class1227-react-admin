@@ -6,6 +6,7 @@ import { notification } from "antd";
 import history from "./history";
 import store from "../redux/store";
 import { removeToken } from "@redux/actions/login";
+import { resetUser } from "@comps/Authorized/redux";
 // 进度条
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
@@ -115,6 +116,7 @@ axiosInstance.interceptors.response.use(
       // 401说明token非法
       if (status === 401) {
         localStorage.removeItem("user_token");
+        store.dispatch(resetUser());
         store.dispatch(removeToken());
       }
 

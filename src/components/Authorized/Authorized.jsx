@@ -21,7 +21,7 @@ class Authorized extends Component {
       getAccessRoutes,
       updateLoading,
     } = this.props;
-
+    
     const promises = [];
 
     if (!roles.length) {
