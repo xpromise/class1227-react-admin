@@ -53,19 +53,19 @@ function removeMenu(menuList, id) {
 
 export default function menuList(prevState = initMenuList, action) {
   let menuList = null;
+  menuList = JSON.parse(JSON.stringify(prevState));
+
   switch (action.type) {
     case GET_MENU_LIST:
       return action.data;
     case ADD_MENU:
-      menuList = JSON.parse(JSON.stringify(prevState));
       return addMenu(menuList, action.data);
     case UPDATE_MENU:
-      menuList = JSON.parse(JSON.stringify(prevState));
       return updateMenu(menuList, action.data);
     case REMOVE_MENU:
-      menuList = JSON.parse(JSON.stringify(prevState));
       return removeMenu(menuList, action.data);
     default:
       return prevState;
   }
+  
 }

@@ -3,38 +3,27 @@ import React, { Component } from "react";
 import { Button, Table } from "antd";
 // 引入antd字体图标
 import { PlusOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons";
+import { connect } from "react-redux";
 
-import { reqGetSubjectList } from "@api/edu/subject";
+import { getSubjectList } from "./redux";
 
 import "./index.less";
 
-export default class Subject extends Component {
-  state = {
-    subjects: {
-      total: 0,
-      items: [],
-    },
-  };
-
+@connect(
+  (state) => ({ subjectList: state.subjectList }), // 状态数据
+  {
+    // 更新状态数据的方法
+    getSubjectList,
+  }
+)
+class Subject extends Component {
   componentDidMount() {
     // 代表一上来请求第一页数据
-    this.getSubjectList(1, 10);
+    this.props.getSubjectList(1, 10);
   }
 
-  // 获取subject分页列表数据
-  getSubjectList = async (page, limit) => {
-    // console.log(page, limit);
-    // 发送请求
-    const result = await reqGetSubjectList(page, limit);
-    // console.log(result);
-    // 更新数据
-    this.setState({
-      subjects: result,
-    });
-  };
-
   render() {
-    const { subjects } = this.state;
+    const { subjectList, getSubjectList } = this.props;
 
     const columns = [
       {
@@ -67,16 +56,6 @@ export default class Subject extends Component {
       },
     ];
 
-    /* const data = [
-      {
-        key: 1,
-        name: "John Brown",
-        age: 32,
-        address: "New York No. 1 Lake Park",
-        description:
-          "My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.",
-      },
-    ];*/
     return (
       <div className="subject">
         <Button type="primary" className="subject-btn">
@@ -96,18 +75,22 @@ export default class Subject extends Component {
             // 返回值false 就是不可以展开
             rowExpandable: (record) => record.name !== "Not Expandable",
           }}
-          dataSource={subjects.items} // 决定每一行显示的数据
+          dataSource={subjectList.items} // 决定每一行显示的数据
           rowKey="_id" // 指定key属性的值是_id
           pagination={{
-            total: subjects.total, // 数据总数
+            // 分页器
+            total: subjectList.total, // 数据总数
             showQuickJumper: true, // 是否显示快速跳转
             showSizeChanger: true, // 是否显示修改每页显示数量
             pageSizeOptions: ["5", "10", "15", "20"],
             defaultPageSize: 10,
-            onChange: this.getSubjectList, // 页码发生变化触发的回调
+            onChange: getSubjectList, // 页码发生变化触发的回调
+            onShowSizeChange: getSubjectList,
           }}
         />
       </div>
     );
   }
 }
+
+export default Subject;
