@@ -61,14 +61,10 @@ class Subject extends Component {
     });
   };
 
-  // 点击展开一级菜单
-  // handleExpand = (expanded, record) => {
-  //   console.log("handleExpand", expanded, record);
-  // if (!expanded) return;
-  // 请求一级菜单对应二级菜单数据
-  // this.props.getSubSubjectList(record._id);
-  // 更新state --> 告诉Table哪个子菜单需要展开
-  // };
+  // 显示添加页面
+  showAddSubject = () => {
+    this.props.history.push("/edu/subject/add");
+  };
 
   render() {
     const { subjectList, getSubjectList } = this.props;
@@ -107,7 +103,11 @@ class Subject extends Component {
 
     return (
       <div className="subject">
-        <Button type="primary" className="subject-btn">
+        <Button
+          type="primary"
+          className="subject-btn"
+          onClick={this.showAddSubject}
+        >
           <PlusOutlined />
           新建
         </Button>
