@@ -12,7 +12,15 @@ const initSubjectList = {
 export default function subjectList(prevState = initSubjectList, action) {
   switch (action.type) {
     case GET_SUBJECT_LIST: // 获取一级课程分类数据
-      return action.data;
+      return {
+        total: action.data.total,
+        items: action.data.items.map((subject) => {
+          return {
+            ...subject,
+            children: [], // 添加children属性，当前项就是可展开项，才会显示展开图标
+          };
+        }),
+      };
     case GET_SUB_SUBJECT_LIST: // 获取二级课程分类数据
       // 将二级分类数据添加到某个一级分类数据children上~
       const { parentId, subSubjectList } = action.data;
