@@ -25,6 +25,7 @@ class Subject extends Component {
 
   // 点击展开一级菜单
   handleExpand = (expanded, record) => {
+    if (!expanded) return;
     // 请求一级菜单对应二级菜单数据
     this.props.getSubSubjectList(record._id);
   };
@@ -77,6 +78,7 @@ class Subject extends Component {
             expandedRowRender: (record) => {
               // 判断有没有children
               const children = record.children ? record.children : [];
+
               return children.map((subSubject) => {
                 return (
                   <div key={subSubject._id} className="sub-subject-row">
@@ -97,7 +99,6 @@ class Subject extends Component {
             // 返回值true 就是可以展开
             // 返回值false 就是不可以展开
             // rowExpandable: (record) => record.name !== "Not Expandable",
-
             onExpand: this.handleExpand,
           }}
           dataSource={subjectList.items} // 决定每一行显示的数据
