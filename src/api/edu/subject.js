@@ -21,3 +21,15 @@ export function reqGetSubSubjectList(parentId) {
     method: "GET",
   });
 }
+
+// 添加课程分类
+export function reqAddSubject(title, parentId) {
+  return request({
+    url: `${MOCK_BASE_URL}/save`,
+    method: "POST",
+    data: { // 请求参数
+      title,
+      parentId,
+    },
+  });
+}

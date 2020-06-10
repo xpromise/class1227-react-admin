@@ -29,9 +29,9 @@ export const getSubjectList = (page, limit) => {
       // 更新redux状态数据
       dispatch(getSubjectListSync(response));
       // 让请求成功时，返回一个请求成功的数据
-      return response;
+      return response.items;
     });
-
+    
     // 以下写法外面使用时，没有返回值
     // reqGetSubjectList(page, limit).then((response) => {
     //   // 更新redux状态数据

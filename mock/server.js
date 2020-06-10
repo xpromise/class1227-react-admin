@@ -8,6 +8,9 @@ const Random = Mock.Random;
 // 随机中文标题
 Random.ctitle();
 
+// 使用解析POST/PUT请求的请求体参数的中间件
+app.use(express.json());
+
 // app.use() 中间件，代表接受所有请求
 // 使用cors 解决跨域
 app.use((req, res, next) => {
@@ -16,6 +19,27 @@ app.use((req, res, next) => {
   res.set("Access-Control-Allow-Headers", "content-type, token");
   res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   next(); // 触发下一个中间件/路由
+});
+
+app.post("/admin/edu/subject/save", (req, res, next) => {
+  // 默认express不解析请求体参数
+  // 需要使用中间件
+  const { title, parentId } = req.body;
+
+  console.log(title, parentId);
+
+  // 返回响应
+  res.json({
+    code: 20000, // 成功状态码
+    success: true, // 成功
+    data: {
+      // 成功的具体数据
+      _id: Date.now(),
+      title,
+      parentId,
+    },
+    message: "", // 失败原因
+  });
 });
 
 /*
