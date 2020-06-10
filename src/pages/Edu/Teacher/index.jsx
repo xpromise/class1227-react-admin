@@ -1,7 +1,6 @@
 import React, { Component, createRef } from "react";
 import { Button, message, Tooltip, Modal, Typography } from "antd";
 import {
-  SettingOutlined,
   PlusOutlined,
   FormOutlined,
   DeleteOutlined,

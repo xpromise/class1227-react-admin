@@ -14,6 +14,8 @@ const layoutCol = {
 };
 
 function AddOrUpdateUser(props) {
+  const [form] = Form.useForm();
+
   const onFinish = (values) => {
     const {
       location: { pathname },
@@ -49,7 +51,7 @@ function AddOrUpdateUser(props) {
         form.setFieldsValue(response);
       });
     }
-  }, []);
+  }, [props, form]);
 
   const {
     location: { pathname },
@@ -58,8 +60,6 @@ function AddOrUpdateUser(props) {
   const isAddUser = pathname === "/acl/user/add";
 
   const title = isAddUser ? "添加用户" : "更新用户";
-
-  const [form] = Form.useForm();
 
   return (
     <Card

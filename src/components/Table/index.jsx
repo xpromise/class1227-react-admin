@@ -154,7 +154,7 @@ class Table extends Component {
         >
           列展示
         </Checkbox>
-        <a onClick={this.resetCheckbox}>重置</a> 
+        <button onClick={this.resetCheckbox}>重置</button> 
       </div>
     );
 

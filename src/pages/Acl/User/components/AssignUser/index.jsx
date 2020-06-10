@@ -25,7 +25,7 @@ function AssignUser(props) {
       setRole(role || {});
       setRoleList(res.allRolesList);
     });
-  }, []);
+  }, [form, props]);
 
   const onFinish = (values) => {
     const { roleId } = values;

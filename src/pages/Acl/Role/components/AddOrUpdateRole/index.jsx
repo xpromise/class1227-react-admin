@@ -14,6 +14,8 @@ const layoutCol = {
 };
 
 function AddOrUpdateRole(props) {
+  const [form] = Form.useForm();
+
   const onFinish = (values) => {
     const {
       location: { pathname },
@@ -49,7 +51,7 @@ function AddOrUpdateRole(props) {
         form.setFieldsValue(response);
       });
     }
-  }, []);
+  }, [props, form]);
 
   const {
     location: { pathname },
@@ -58,8 +60,6 @@ function AddOrUpdateRole(props) {
   const isAddRole = pathname === "/acl/role/add";
 
   const title = isAddRole ? "添加角色" : "更新角色";
-
-  const [form] = Form.useForm();
 
   return (
     <Card
