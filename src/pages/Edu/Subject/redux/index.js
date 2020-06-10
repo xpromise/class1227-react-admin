@@ -3,9 +3,10 @@
 */
 import subjectList from "./reducer";
 
-import { getSubjectList } from "./actions";
+import { getSubjectList, getSubSubjectList } from "./actions";
 
-export { 
+export {
   subjectList, // 状态数据
-  getSubjectList // 更新状态数据的方法 
-}; 
+  getSubjectList, // 更新状态数据的方法
+  getSubSubjectList,
+};

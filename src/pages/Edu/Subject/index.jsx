@@ -5,7 +5,7 @@ import { Button, Table } from "antd";
 import { PlusOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons";
 import { connect } from "react-redux";
 
-import { getSubjectList } from "./redux";
+import { getSubjectList, getSubSubjectList } from "./redux";
 
 import "./index.less";
 
@@ -14,6 +14,7 @@ import "./index.less";
   {
     // 更新状态数据的方法
     getSubjectList,
+    getSubSubjectList,
   }
 )
 class Subject extends Component {
@@ -21,6 +22,12 @@ class Subject extends Component {
     // 代表一上来请求第一页数据
     this.props.getSubjectList(1, 10);
   }
+
+  // 点击展开一级菜单
+  handleExpand = (expanded, record) => {
+    // 请求一级菜单对应二级菜单数据
+    this.props.getSubSubjectList(record._id);
+  };
 
   render() {
     const { subjectList, getSubjectList } = this.props;
@@ -67,13 +74,31 @@ class Subject extends Component {
           expandable={{
             // 决定列是否可以展开
             // 决定行展开时显示什么内容
-            expandedRowRender: (record) => (
-              <p style={{ margin: 0 }}>{record.description}</p>
-            ),
+            expandedRowRender: (record) => {
+              // 判断有没有children
+              const children = record.children ? record.children : [];
+              return children.map((subSubject) => {
+                return (
+                  <div key={subSubject._id} className="sub-subject-row">
+                    <div>{subSubject.title}</div>
+                    <div className="sub-subject-row-right">
+                      <Button type="primary">
+                        <FormOutlined />
+                      </Button>
+                      <Button type="danger" className="subject-btn">
+                        <DeleteOutlined />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              });
+            },
             // 决定行是否可以展开
             // 返回值true 就是可以展开
             // 返回值false 就是不可以展开
-            rowExpandable: (record) => record.name !== "Not Expandable",
+            // rowExpandable: (record) => record.name !== "Not Expandable",
+
+            onExpand: this.handleExpand,
           }}
           dataSource={subjectList.items} // 决定每一行显示的数据
           rowKey="_id" // 指定key属性的值是_id
