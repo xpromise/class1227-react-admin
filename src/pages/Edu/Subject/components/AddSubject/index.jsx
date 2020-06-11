@@ -17,7 +17,6 @@ import { reqAddSubject } from "@api/edu/subject";
 import "./index.less";
 
 const { Option } = Select;
-
 // 页数
 let page = 1;
 
@@ -41,6 +40,7 @@ function AddSubject({ total, getSubjectList, history }) {
 
   // 工厂函数组件：发送请求请求数据
   useEffect(() => {
+    page = 1; // 每次第一次进来访问当前组件，重置为1
     const fetchData = async () => {
       // 第二个参数传入空数组，代表当前函数只会执行一次
       // 相对一ComponentDidMount

@@ -43,7 +43,7 @@ class Subject extends Component {
   // 点击展开一级菜单
   // expandedRowKeys展开的行项（如果有没有展开的会自动去掉）
   handleExpandedRowsChange = (expandedRowKeys) => {
-    console.log("handleExpandedRowsChange", expandedRowKeys);
+    // console.log("handleExpandedRowsChange", expandedRowKeys);
     // 长度
     const length = expandedRowKeys.length;
 
@@ -59,6 +59,12 @@ class Subject extends Component {
     this.setState({
       expandedRowKeys,
     });
+  };
+  
+  // 解决在第二页切换每页数量时显示数据不正确问题~
+  getFirstPageSubjectList = (page, limit) => {
+    // 每页数量发生变化触发的回调
+    this.props.getSubjectList(1, limit);
   };
 
   // 显示添加页面
@@ -134,7 +140,7 @@ class Subject extends Component {
             pageSizeOptions: ["5", "10", "15", "20"],
             defaultPageSize: 10,
             onChange: getSubjectList, // 页码发生变化触发的回调
-            onShowSizeChange: getSubjectList,
+            onShowSizeChange: this.getFirstPageSubjectList,
           }}
         />
       </div>
