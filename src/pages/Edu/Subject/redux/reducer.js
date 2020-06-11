@@ -1,7 +1,11 @@
 /*
   根据之前状态和action来生成新状态
 */
-import { GET_SUBJECT_LIST, GET_SUB_SUBJECT_LIST } from "./constants";
+import {
+  GET_SUBJECT_LIST,
+  GET_SUB_SUBJECT_LIST,
+  UPDATE_SUBJECT,
+} from "./constants";
 
 // 初始化数据
 const initSubjectList = {
@@ -30,6 +34,32 @@ export default function subjectList(prevState = initSubjectList, action) {
           if (subject._id === parentId) {
             subject.children = subSubjectList;
           }
+          return subject;
+        }),
+      };
+    case UPDATE_SUBJECT:
+      return {
+        total: prevState.total,
+        items: prevState.items.map((subject) => {
+          // 一级分类
+          if (subject._id === action.data._id) {
+            return {
+              ...subject, // 展开原数据
+              ...action.data, // 展开新数据 --> 新数据会覆盖原数据
+            };
+          }
+          
+          // 二级分类
+          subject.children = subject.children.map((item) => {
+            if (item._id === action.data._id) {
+              return {
+                ...item, // 展开原数据
+                ...action.data, // 展开新数据 --> 新数据会覆盖原数据
+              };
+            }
+            return item;
+          });
+
           return subject;
         }),
       };

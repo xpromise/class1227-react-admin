@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 // 引入antd组件
-import { Button, Table } from "antd";
+import { Button, Table, Tooltip, Input, message } from "antd";
 // 引入antd字体图标
 import { PlusOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons";
 import { connect } from "react-redux";
 
-import { getSubjectList, getSubSubjectList } from "./redux";
+import { getSubjectList, getSubSubjectList, updateSubject } from "./redux";
 
 import "./index.less";
 
@@ -15,11 +15,14 @@ import "./index.less";
     // 更新状态数据的方法
     getSubjectList,
     getSubSubjectList,
+    updateSubject,
   }
 )
 class Subject extends Component {
   state = {
     expandedRowKeys: [], // 展开项
+    subjectId: "", // 要更新商品分类id
+    updateSubjectTitle: "", // 正在更新分类的标题
   };
 
   componentDidMount() {
@@ -60,7 +63,7 @@ class Subject extends Component {
       expandedRowKeys,
     });
   };
-  
+
   // 解决在第二页切换每页数量时显示数据不正确问题~
   getFirstPageSubjectList = (page, limit) => {
     // 每页数量发生变化触发的回调
@@ -70,6 +73,38 @@ class Subject extends Component {
   // 显示添加页面
   showAddSubject = () => {
     this.props.history.push("/edu/subject/add");
+  };
+
+  // 显示更新分类
+  showUpdateSubject = (subjectId) => {
+    return () => {
+      this.setState({
+        subjectId,
+      });
+    };
+  };
+
+  // 收集更新分类标题数据
+  handleInputChange = (e) => {
+    this.setState({
+      updateSubjectTitle: e.target.value,
+    });
+  };
+
+  // 更新课程分类
+  updateSubject = async () => {
+    const { subjectId, updateSubjectTitle } = this.state;
+    // 更新数据 --> 1. 更新服务器数据（发送请求） 2. 更新客户端数据（redux数据）
+    await this.props.updateSubject(updateSubjectTitle, subjectId);
+    message.success("更新分类数据成功~");
+    this.cancel();
+  };
+  // 取消更新课程分类
+  cancel = () => {
+    this.setState({
+      subjectId: "",
+      updateSubjectTitle: "",
+    });
   };
 
   render() {
@@ -82,9 +117,33 @@ class Subject extends Component {
         title: "分类名称",
         // 当前列要显示data中哪个数据（显示数据的key属性）
         // data[dataIndex]
-        dataIndex: "title",
+        // dataIndex: "title",
         // 遍历元素需要唯一key属性
         key: "title",
+        /*
+          render方法接受参数看dataIndex的值
+          如果dataIndex: title, render方法就能接受title的值
+          如果dataIndex: _id, render方法就能接受_id的值
+          如果dataIndex: '', render方法就能接受当前所有数据的值
+        */
+        render: (subject) => {
+          // 点击按钮要更新的目标分类id
+          const { subjectId } = this.state;
+          // 得到当前渲染的分类id
+          const id = subject._id;
+
+          if (subjectId === id) {
+            return (
+              <Input
+                className="subject-input"
+                defaultValue={subject.title}
+                onChange={this.handleInputChange}
+              />
+            );
+          }
+
+          return <span>{subject.title}</span>;
+        },
       },
       {
         title: "操作",
@@ -94,16 +153,43 @@ class Subject extends Component {
         width: 200,
         // 默认情况下，渲染的内容是纯文本
         // 如果想渲染成其他方案（按钮）需要用render方法指定
-        render: () => (
-          <>
-            <Button type="primary">
-              <FormOutlined />
-            </Button>
-            <Button type="danger" className="subject-btn">
-              <DeleteOutlined />
-            </Button>
-          </>
-        ),
+        render: (subject) => {
+          // 点击按钮要更新的目标分类id
+          const { subjectId } = this.state;
+          // 得到当前渲染的分类id
+          const id = subject._id;
+
+          if (subjectId === id) {
+            return (
+              <>
+                <Button type="primary" onClick={this.updateSubject}>
+                  确认
+                </Button>
+                <Button className="subject-btn" onClick={this.cancel}>
+                  取消
+                </Button>
+              </>
+            );
+          }
+
+          return (
+            <>
+              <Tooltip title="更新课程分类">
+                <Button
+                  type="primary"
+                  onClick={this.showUpdateSubject(subject._id)}
+                >
+                  <FormOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title="删除课程分类">
+                <Button type="danger" className="subject-btn">
+                  <DeleteOutlined />
+                </Button>
+              </Tooltip>
+            </>
+          );
+        },
       },
     ];
 

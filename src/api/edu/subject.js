@@ -34,3 +34,16 @@ export function reqAddSubject(title, parentId) {
     },
   });
 }
+
+// 更新课程分类
+export function reqUpdateSubject(title, id) {
+  return request({
+    url: `${BASE_URL}/update`,
+    method: "PUT",
+    data: {
+      // 请求参数
+      title,
+      id,
+    },
+  });
+}
