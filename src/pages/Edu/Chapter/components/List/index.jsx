@@ -9,11 +9,14 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 
 import { getLessonList } from "../../redux";
 
 import "./index.less";
 
+// withRouter：给非路由组件传递路由组件的三大属性
+@withRouter
 @connect((state) => ({ chapters: state.chapter.chapters }), { getLessonList })
 class List extends Component {
   state = {
@@ -30,6 +33,14 @@ class List extends Component {
     this.setState({
       expandedRowKeys,
     });
+  };
+
+  showAddLesson = (chapter) => {
+    return () => {
+      // 默认情况下不是路由组件，没有三大属性
+      // 解决：需要三大属性 --> withRouter
+      this.props.history.push("/edu/chapter/addlesson", chapter);
+    };
   };
 
   render() {
@@ -62,7 +73,7 @@ class List extends Component {
                   <Button
                     type="primary"
                     className="chapter-btn"
-                    // onClick={this.showUpdateSubject(subject)}
+                    onClick={this.showAddLesson(data)}
                   >
                     <PlusOutlined />
                   </Button>
@@ -71,7 +82,7 @@ class List extends Component {
               <Tooltip title="更新">
                 <Button
                   type="primary"
-                  
+
                   // onClick={this.showUpdateSubject(subject)}
                 >
                   <FormOutlined />
