@@ -1,8 +1,10 @@
 import React from "react";
 
-import { Card, PageHeader, Form, Button, Input, Switch } from "antd";
+import { Card, PageHeader, Form, Button, Input, Switch, message } from "antd";
 
 import Upload from "@comps/Upload";
+
+import { reqAddLesson } from "@api/edu/lesson";
 
 import "./index.less";
 
@@ -12,9 +14,17 @@ const layout = {
   wrapperCol: { span: 5 }, // 右边Input所占宽度比例
 };
 
-export default function AddLesson() {
-  const onFinish = () => {};
-  const onBack = () => {};
+export default function AddLesson({ location, history }) {
+  const onFinish = async (values) => {
+    const chapterId = location.state._id;
+    await reqAddLesson({ ...values, chapterId });
+    message.success("添加课时成功~");
+    history.push("/edu/chapter/list");
+  };
+
+  const onBack = () => {
+    history.push("/edu/chapter/list");
+  };
 
   return (
     <Card
@@ -27,7 +37,7 @@ export default function AddLesson() {
         />
       }
     >
-      <Form {...layout} onFinish={onFinish}>
+      <Form {...layout} onFinish={onFinish} initialValues={{ free: true }}>
         <Form.Item
           label="课时名称"
           name="title"
@@ -39,7 +49,7 @@ export default function AddLesson() {
         <Form.Item
           label="是否免费"
           name="free"
-          // rules={[{ required: true, message: "请选择父级分类" }]}
+          rules={[{ required: true, message: "请选择是否免费" }]}
           // Form表单默认会接管组件value属性
           // 但是Switch组件不要value，需要的是checked
           valuePropName="checked"
@@ -47,9 +57,12 @@ export default function AddLesson() {
           <Switch checkedChildren="是" unCheckedChildren="否" defaultChecked />
         </Form.Item>
 
-        <div className="upload">
+        <Form.Item
+          name="video"
+          rules={[{ required: true, message: "请上传视频" }]}
+        >
           <Upload />
-        </div>
+        </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" className="add-lesson-btn">

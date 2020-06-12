@@ -40,7 +40,20 @@
    };
   ```
 - 开始上传
+
   - `this.subscription = observable.subscribe(observer);`
 
 - 将来可能要取消上传
   - `this.subscription.unsubscribe();`
+
+## 如何修改将上传视频切换到自己的七牛云呢？
+
+- 客户端
+  - 修改 config/qiniu.js
+    - region
+    - prefix_url
+- 服务端
+  - 修改 config/index.js
+  - ACCESSKEY 七牛云/个人中心/密钥管理
+  - SERECTKEY 七牛云/个人中心/密钥管理
+  - BUCKET 对象存储空间的名称

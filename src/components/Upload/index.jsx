@@ -11,6 +11,8 @@ import { nanoid } from "nanoid"; // 用来生成唯一id
 
 import { reqGetUploadToken } from "@api/edu/upload";
 
+import qiniuConfig from "@conf/qiniu";
+
 const MAX_VIDEO_SIZE = 35 * 1024 * 1024; // 35mb
 
 /*
@@ -46,7 +48,10 @@ export default class Upload extends Component {
   };
 
   // 初始化状态
-  state = this.getUploadToken();
+  state = {
+    ...this.getUploadToken(),
+    isUploadSuccess: false,
+  };
 
   fetchUploadToken = async () => {
     const { uploadToken, expires } = await reqGetUploadToken();
@@ -125,7 +130,7 @@ export default class Upload extends Component {
       // qiniu.region.z2: 代表华南区域
       // qiniu.region.na0: 代表北美区域
       // qiniu.region.as0: 代表东南亚区域
-      region: qiniu.region.z2,
+      region: qiniuConfig.region,
     };
     // 1. 创建上传文件对象
     const observable = qiniu.upload(
@@ -165,10 +170,18 @@ export default class Upload extends Component {
         onError(err);
         message.error("上传视频失败~");
       },
-      complete(res) {
+      complete: (res) => {
         // 上传成功（全部数据上传完毕）触发的回调函数
         onSuccess(res);
         message.success("上传视频成功~");
+        // console.log(res); // {hash: "FtaFsLF3Z_j_-q209fBTqb7pQheN", key: "mHhiHjtY3h"}
+        const video = qiniuConfig.prefix_url + res.key;
+        // onChange是Form.Item传入的，当你调用传入值时。这个值就会被Form收集
+        this.props.onChange(video);
+        // 隐藏按钮
+        this.setState({
+          isUploadSuccess: true,
+        });
       },
     };
     // 3. 开始上传
@@ -180,21 +193,36 @@ export default class Upload extends Component {
 
   componentWillUnmount() {
     // 上传取消
-    this.subscription.unsubscribe();
+    // 如果没有上传过 this.subscription时undefined，此时不需要取消上传~
+    this.subscription && this.subscription.unsubscribe();
   }
 
+  remove = () => {
+    // 上传取消
+    this.subscription && this.subscription.unsubscribe();
+
+    this.props.onChange("");
+    // 显示按钮
+    this.setState({
+      isUploadSuccess: false,
+    });
+  };
+
   render() {
+    const { isUploadSuccess } = this.state;
     return (
       <AntdUpload
-        className="upload"
         accept="video/mp4" // 决定上传选择的文件类型
         listType="picture"
         beforeUpload={this.beforeUpload}
         customRequest={this.customRequest}
+        onRemove={this.remove}
       >
-        <Button>
-          <UploadOutlined /> 上传视频
-        </Button>
+        {isUploadSuccess ? null : (
+          <Button>
+            <UploadOutlined /> 上传视频
+          </Button>
+        )}
       </AntdUpload>
     );
   }
