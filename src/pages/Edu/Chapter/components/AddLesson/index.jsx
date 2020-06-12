@@ -15,6 +15,7 @@ const layout = {
 };
 
 export default function AddLesson({ location, history }) {
+  
   const onFinish = async (values) => {
     const chapterId = location.state._id;
     await reqAddLesson({ ...values, chapterId });

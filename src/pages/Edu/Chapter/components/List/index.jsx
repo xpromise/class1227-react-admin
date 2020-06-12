@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Tooltip, Alert, Table } from "antd";
+import { Button, Tooltip, Alert, Table, Modal } from "antd";
 import {
   PlusOutlined,
   FullscreenOutlined,
@@ -7,9 +7,11 @@ import {
   SettingOutlined,
   FormOutlined,
   DeleteOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
+import Player from "griffith";
 
 import { getLessonList } from "../../redux";
 
@@ -21,6 +23,8 @@ import "./index.less";
 class List extends Component {
   state = {
     expandedRowKeys: [],
+    isShowVideoModal: false, // Modal显示&隐藏
+    lesson: {}, // 显示的数据
   };
 
   handleExpandedRowsChange = (expandedRowKeys) => {
@@ -43,9 +47,25 @@ class List extends Component {
     };
   };
 
+  showVideoModal = (lesson) => {
+    return () => {
+      this.setState({
+        isShowVideoModal: true,
+        lesson,
+      });
+    };
+  };
+
+  hidden = () => {
+    this.setState({
+      isShowVideoModal: false,
+      lesson: {},
+    });
+  };
+
   render() {
     const { chapters } = this.props;
-    const { expandedRowKeys } = this.state;
+    const { expandedRowKeys, isShowVideoModal, lesson } = this.state;
 
     const columns = [
       {
@@ -59,6 +79,21 @@ class List extends Component {
         key: "free",
         render: (free) => {
           return free === undefined ? "" : free ? "是" : "否";
+        },
+      },
+      {
+        title: "视频",
+        key: "video",
+        render: (lesson) => {
+          return (
+            "video" in lesson && (
+              <Tooltip title="预览视频">
+                <Button onClick={this.showVideoModal(lesson)}>
+                  <EyeOutlined />
+                </Button>
+              </Tooltip>
+            )
+          );
         },
       },
       {
@@ -153,6 +188,33 @@ class List extends Component {
             // onShowSizeChange: this.getFirstPageSubjectList,
           }}
         />
+
+        <Modal
+          title={lesson.title} // 标题
+          visible={isShowVideoModal} // 显示&隐藏
+          onCancel={this.hidden}
+          footer={null}
+          centered // 垂直居中
+          destroyOnClose={true} // 关闭时销毁子元素
+        >
+          {/* https://github.com/zhihu/griffith/blob/master/README-zh-Hans.md */}
+          <Player
+            // id="video"
+            // duration={128}
+            // cover="http://localhost:3000/static/media/logo.ba1f87ec.png" // 封面图
+            sources={{
+              hd: {
+                // bitrate: 1000,
+                // duration: 128,
+                // format: "mp4",
+                // height: 468,
+                // width: 864,
+                // size: 20000,
+                play_url: lesson.video,
+              },
+            }}
+          />
+        </Modal>
       </div>
     );
   }
