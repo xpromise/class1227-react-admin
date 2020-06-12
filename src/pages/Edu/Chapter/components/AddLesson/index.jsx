@@ -47,7 +47,9 @@ export default function AddLesson() {
           <Switch checkedChildren="是" unCheckedChildren="否" defaultChecked />
         </Form.Item>
 
-        <Upload />
+        <div className="upload">
+          <Upload />
+        </div>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" className="add-lesson-btn">

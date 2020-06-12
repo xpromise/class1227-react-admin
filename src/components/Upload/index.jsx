@@ -19,26 +19,48 @@ const MAX_VIDEO_SIZE = 35 * 1024 * 1024; // 35mb
 */
 
 export default class Upload extends Component {
-  constructor() {
-    super();
-    // 读取本地数据
-    const data = localStorage.getItem("upload_token");
-    // 初始化要更新状态
-    const state = {
-      uploadToken: "",
-      expires: 0,
-    };
+  // 从本地读取UploadToken
+  getUploadToken = () => {
+    try {
+      // 从本地读取数据，并解析成对象
+      const { uploadToken, expires } = JSON.parse(
+        localStorage.getItem("upload_token")
+      );
 
-    if (data) {
-      const { uploadToken, expires } = JSON.parse(data);
-      // 修改状态为本地的数据
-      state.uploadToken = uploadToken;
-      state.expires = expires;
+      // 判断本地token是否过期
+      if (!this.isValidUploadToken(expires)) {
+        throw new Error("uploadToken过期了~");
+      }
+
+      return {
+        uploadToken,
+        expires,
+      };
+    } catch {
+      // JSON解析失败
+      return {
+        uploadToken: "",
+        expires: 0,
+      };
     }
-    // 状态的初始化
-    this.state = state;
-  }
+  };
 
+  // 初始化状态
+  state = this.getUploadToken();
+
+  fetchUploadToken = async () => {
+    const { uploadToken, expires } = await reqGetUploadToken();
+    this.saveUploadToken(uploadToken, expires);
+  };
+
+  // 判断UploadToken是否有效
+  // 返回值 true 有效
+  // 返回值 false 无效
+  isValidUploadToken = (expires) => {
+    return expires > Date.now();
+  };
+
+  // 保存UploadToken
   saveUploadToken = (uploadToken, expires) => {
     const data = {
       uploadToken,
@@ -46,9 +68,9 @@ export default class Upload extends Component {
       // 提前 5分钟 刷新
       expires: Date.now() + expires * 1000 - 5 * 60 * 1000,
     };
-
+    // 更新状态
     this.setState(data);
-
+    // 持久化储存
     localStorage.setItem("upload_token", JSON.stringify(data));
   };
 
@@ -77,25 +99,19 @@ export default class Upload extends Component {
       */
       const { expires } = this.state;
 
-      if (expires < Date.now()) {
+      if (!this.isValidUploadToken(expires)) {
         // 过期了，重新请求
-        const { uploadToken, expires } = await reqGetUploadToken();
-        this.saveUploadToken(uploadToken, expires);
+        await this.fetchUploadToken();
       }
-
       // 文件大小OK
       resolve(file); // file就会作为要上传的文件，进行上传~
     });
   };
 
   // 自定义上传视频方案
-  customRequest = ({ file }) => {
-    /*
-      yarn add qiniu-js
-
-      上传凭据：
-        特点：2小时有效 --> 缓存起来，2小时请求一次~
-    */
+  customRequest = ({ file, onProgress, onSuccess, onError }) => {
+    const { uploadToken } = this.state;
+    // console.log(uploadToken);
     const key = nanoid(10); // 生成长度为10随机id，并且一定会保证id是唯一的
     const putExtra = {
       fname: "", // 文件原名称
@@ -115,7 +131,7 @@ export default class Upload extends Component {
     const observable = qiniu.upload(
       file, // 上传的文件
       key, // 上传的文件新命名（保证唯一性）
-      this.state.uploadToken, // 上传凭证
+      uploadToken, // 上传凭证
       putExtra,
       config
     );
@@ -123,24 +139,56 @@ export default class Upload extends Component {
     const observer = {
       next(res) {
         // 上传过程中触发的回调函数
+        // 上传总进度
+        const percent = res.total.percent.toFixed(2);
+        // 更新上次进度
+        onProgress({ percent }, file);
+        /*
+          // 大于 4M 时可分块上传，小于 4M 时直传
+          // 代表每一个块上传的进度
+          chunks: { 
+            0: {loaded: 1130496, size: 4194304, percent: 26.953125}
+            1: {loaded: 311296, size: 4194304, percent: 7.421875}
+            2: {loaded: 589824, size: 4194304, percent: 14.0625}
+            3: {loaded: 0, size: 4194304, percent: 0}
+            4: {loaded: 0, size: 4194304, percent: 0}
+            5: {loaded: 0, size: 2664146, percent: 0}
+          },
+          total: {
+            // 总进度
+            percent: 26.953125
+          }
+        */
       },
       error(err) {
         // 上传失败触发的回调函数
+        onError(err);
+        message.error("上传视频失败~");
       },
       complete(res) {
         // 上传成功（全部数据上传完毕）触发的回调函数
+        onSuccess(res);
+        message.success("上传视频成功~");
       },
     };
     // 3. 开始上传
-    const subscription = observable.subscribe(observer);
+    this.subscription = observable.subscribe(observer);
 
     // 上传取消
     // subscription.unsubscribe();
   };
 
+  componentWillUnmount() {
+    // 上传取消
+    this.subscription.unsubscribe();
+  }
+
   render() {
     return (
       <AntdUpload
+        className="upload"
+        accept="video/mp4" // 决定上传选择的文件类型
+        listType="picture"
         beforeUpload={this.beforeUpload}
         customRequest={this.customRequest}
       >
