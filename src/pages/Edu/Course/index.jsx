@@ -12,7 +12,7 @@ import {
 } from "@ant-design/icons";
 
 import { connect } from "react-redux";
-import SearchForm from "./SearchForm";
+import Search from "./components/Search";
 // import { getCourseList } from "./redux";
 
 // import { filterPermissions } from "@utils/permission";
@@ -633,7 +633,7 @@ class Course extends Component {
     return (
       <div>
         <div className="course-search">
-          <SearchForm />
+          <Search />
         </div>
 
         <div className="course-table">
