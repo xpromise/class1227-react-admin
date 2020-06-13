@@ -12,6 +12,7 @@ import {
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import Player from "griffith";
+import screenfull from "screenfull";
 
 import { getLessonList, batchRemoveLessonList } from "../../redux";
 
@@ -83,7 +84,8 @@ class List extends Component {
     } = this.props;
     // console.log(selectedRowKeys);
     // 将id列表分成章节id列表和课时id列表
-    const ids = Array.from(selectedRowKeys); // 剩下的就是lessonIds
+    // const ids = Array.from(selectedRowKeys); // 剩下的就是lessonIds
+    const ids = Array.prototype.slice.call(selectedRowKeys); // 剩下的就是lessonIds
     // 章节id列表
     const chapterIds = [];
 
@@ -101,6 +103,14 @@ class List extends Component {
     await batchRemoveLessonList(ids);
 
     message.success("批量删除数据成功~");
+  };
+
+  // 全屏功能
+  screenfull = () => {
+    // 如何获取真实DOM元素？ --> ref
+    const dom = this.props.fullscreenRef.current;
+    // screenfull.request(dom); // 显示全屏
+    screenfull.toggle(dom); // 切换全屏
   };
 
   render() {
@@ -196,7 +206,7 @@ class List extends Component {
               批量删除
             </Button>
             <Tooltip title="全屏">
-              <FullscreenOutlined />
+              <FullscreenOutlined onClick={this.screenfull} />
             </Tooltip>
             <Tooltip title="刷新">
               <ReloadOutlined />
