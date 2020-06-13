@@ -1,5 +1,8 @@
 import React from "react";
 import { Router } from "react-router-dom";
+import { IntlProvider } from "react-intl";
+import { zh, en } from "./locales";
+
 import history from "@utils/history";
 
 import Layout from "./layouts";
@@ -7,9 +10,19 @@ import Layout from "./layouts";
 import "./assets/css/reset.css";
 
 function App() {
+  const locale = "zh";
+  const messages = locale === "en" ? en : zh;
+
+  // console.log(messages);
+
   return (
     <Router history={history}>
-      <Layout />
+      <IntlProvider
+        locale={locale} // 当前语言环境
+        messages={messages} // 加载使用的语言包
+      >
+        <Layout />
+      </IntlProvider>
     </Router>
   );
 }

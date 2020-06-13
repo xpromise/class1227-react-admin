@@ -54,6 +54,13 @@ class PrimaryLayout extends Component {
     });
   };
 
+  langMenu = (
+    <Menu>
+      <Menu.Item key="zh">中文</Menu.Item>
+      <Menu.Item key="en">English</Menu.Item>
+    </Menu>
+  );
+
   menu = (
     <Menu style={{ width: 150 }} onClick={this.logout}>
       <Menu.Item key="0">
@@ -170,7 +177,9 @@ class PrimaryLayout extends Component {
                   </span>
                 </Dropdown>
                 <span className="site-layout-lang">
-                  <GlobalOutlined />
+                  <Dropdown overlay={this.langMenu}>
+                    <GlobalOutlined />
+                  </Dropdown>
                 </span>
               </span>
             </span>

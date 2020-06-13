@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, Cascader, Button, message } from "antd";
 import { connect } from "react-redux";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import { reqGetAllTeacherList } from "@api/edu/teacher";
 import { reqGetAllSubjectList, reqGetSubSubjectList } from "@api/edu/subject";
@@ -11,6 +12,7 @@ import "./index.less";
 const { Option } = Select;
 
 function SearchForm({ getCourseList, getSearchFormData }) {
+  const intl = useIntl();
   const [form] = Form.useForm();
   const [teachers, setTeachers] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -125,13 +127,23 @@ function SearchForm({ getCourseList, getSearchFormData }) {
 
   return (
     <Form layout="inline" form={form} onFinish={onFinish}>
-      <Form.Item name="title" label="标题">
-        <Input placeholder="课程标题" style={{ width: 250, marginRight: 20 }} />
+      <Form.Item
+        name="title"
+        label={intl.formatMessage({
+          id: "title",
+        })}
+      >
+        <Input
+          placeholder={intl.formatMessage({
+            id: "title",
+          })}
+          style={{ width: 250, marginRight: 20 }}
+        />
       </Form.Item>
-      <Form.Item name="teacherId" label="讲师">
+      <Form.Item name="teacherId" label={<FormattedMessage id="teacher" />}>
         <Select
           allowClear
-          placeholder="课程讲师"
+          placeholder={<FormattedMessage id="teacher" />}
           style={{ width: 250, marginRight: 20 }}
         >
           {teachers.map((teacher) => {
@@ -143,14 +155,16 @@ function SearchForm({ getCourseList, getSearchFormData }) {
           })}
         </Select>
       </Form.Item>
-      <Form.Item name="subject" label="分类">
+      <Form.Item name="subject" label={<FormattedMessage id="subject" />}>
         <Cascader
           style={{ width: 250, marginRight: 20 }}
           options={subjects}
           loadData={loadData}
           // onChange={onChange}
           changeOnSelect
-          placeholder="课程分类"
+          placeholder={intl.formatMessage({
+            id: "subject",
+          })}
         />
       </Form.Item>
       <Form.Item>
@@ -159,9 +173,11 @@ function SearchForm({ getCourseList, getSearchFormData }) {
           htmlType="submit"
           style={{ margin: "0 10px 0 30px" }}
         >
-          查询
+          <FormattedMessage id="searchBtn" />
         </Button>
-        <Button onClick={resetForm}>重置</Button>
+        <Button onClick={resetForm}>
+          <FormattedMessage id="resetBtn" />
+        </Button>
       </Form.Item>
     </Form>
   );
