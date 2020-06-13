@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Select, Cascader, Button } from "antd";
+import { Form, Input, Select, Cascader, Button, message } from "antd";
+import { connect } from "react-redux";
 
 import { reqGetAllTeacherList } from "@api/edu/teacher";
 import { reqGetAllSubjectList, reqGetSubSubjectList } from "@api/edu/subject";
+import { getCourseList } from "../../redux";
 
 import "./index.less";
 
 const { Option } = Select;
 
-function SearchForm() {
+function SearchForm({ getCourseList, getSearchFormData }) {
   const [form] = Form.useForm();
   const [teachers, setTeachers] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -34,23 +36,6 @@ function SearchForm() {
     };
     fetchData();
   }, []);
-
-  const [options, setOptions] = useState([
-    {
-      value: "zhejiang",
-      label: "Zhejiang",
-      isLeaf: false,
-    },
-    {
-      value: "jiangsu",
-      label: "Jiangsu",
-      isLeaf: false,
-    },
-  ]);
-
-  const onChange = (value, selectedOptions) => {
-    // console.log(value, selectedOptions);
-  };
 
   // 点击一级菜单调用函数
   // 加载二级菜单数据
@@ -100,12 +85,46 @@ function SearchForm() {
     setSubjects([...subjects]);
   };
 
+  // 重置按钮
   const resetForm = () => {
     form.resetFields();
   };
 
+  const onFinish = async (values) => {
+    const {
+      title,
+      teacherId,
+      subject = [], // 默认值
+    } = values;
+    let subjectId, subjectParentId;
+
+    if (subject.length === 1) {
+      // 值只有一个，代表是一级分类
+      subjectParentId = "0";
+      subjectId = subject[0];
+    } else if (subject.length === 2) {
+      // 值有两个，代表是二级分类
+      subjectParentId = subject[0];
+      subjectId = subject[1];
+    }
+    // 发送请求查询数据
+    await getCourseList({
+      title,
+      teacherId,
+      page: 1,
+      limit: 10,
+      subjectId,
+      subjectParentId,
+    });
+
+    // 调用父组件方法 给父组件传递数据
+    getSearchFormData({ title, teacherId, subjectId, subjectParentId });
+
+    message.success("查询课程分类数据成功~");
+  };
+
   return (
-    <Form layout="inline" form={form}>
+    <Form layout="inline" form={form} onFinish={onFinish}>
       <Form.Item name="title" label="标题">
         <Input placeholder="课程标题" style={{ width: 250, marginRight: 20 }} />
       </Form.Item>
@@ -148,4 +167,4 @@ function SearchForm() {
   );
 }
 
-export default SearchForm;
+export default connect(null, { getCourseList })(SearchForm);

@@ -10,3 +10,24 @@ export function reqGetAllCourseList() {
     method: "GET",
   });
 }
+
+// 获取课程分页列表数据
+export function reqGetCourseList({
+  page,
+  limit,
+  teacherId,
+  subjectId,
+  subjectParentId,
+  title,
+}) {
+  return request({
+    url: `${BASE_URL}/${page}/${limit}`,
+    method: "GET",
+    params: {
+      teacherId,
+      subjectId,
+      subjectParentId,
+      title,
+    },
+  });
+}
