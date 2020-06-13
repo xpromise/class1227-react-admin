@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Tooltip, Alert, Table, Modal } from "antd";
+import { Button, Tooltip, Alert, Table, Modal, message } from "antd";
 import {
   PlusOutlined,
   FullscreenOutlined,
@@ -13,16 +13,20 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import Player from "griffith";
 
-import { getLessonList } from "../../redux";
+import { getLessonList, batchRemoveLessonList } from "../../redux";
 
 import "./index.less";
 
 // withRouter：给非路由组件传递路由组件的三大属性
 @withRouter
-@connect((state) => ({ chapters: state.chapter.chapters }), { getLessonList })
+@connect((state) => ({ chapters: state.chapter.chapters }), {
+  getLessonList,
+  batchRemoveLessonList,
+})
 class List extends Component {
   state = {
     expandedRowKeys: [],
+    selectedRowKeys: [],
     isShowVideoModal: false, // Modal显示&隐藏
     lesson: {}, // 显示的数据
   };
@@ -36,6 +40,12 @@ class List extends Component {
 
     this.setState({
       expandedRowKeys,
+    });
+  };
+
+  onSelectChange = (selectedRowKeys) => {
+    this.setState({
+      selectedRowKeys,
     });
   };
 
@@ -63,9 +73,44 @@ class List extends Component {
     });
   };
 
+  batchRemove = async () => {
+    // id列表中既有章节 又有课时数据
+    const { selectedRowKeys } = this.state;
+    const {
+      chapters: { items: chapters }, // 对chapters解构赋值
+      // chapters: aaa, // 对chapters进行重命名，为aaa
+      batchRemoveLessonList,
+    } = this.props;
+    // console.log(selectedRowKeys);
+    // 将id列表分成章节id列表和课时id列表
+    const ids = Array.from(selectedRowKeys); // 剩下的就是lessonIds
+    // 章节id列表
+    const chapterIds = [];
+
+    chapters.forEach((chapter) => {
+      const index = ids.indexOf(chapter._id); // 判断数组中是否存在某个元素，存在返回下标，不存在返回-1
+      if (index > -1) {
+        // id就是找到chapterId
+        const [id] = ids.splice(index, 1);
+        chapterIds.push(id);
+      }
+    });
+
+    // console.log(ids);
+
+    await batchRemoveLessonList(ids);
+
+    message.success("批量删除数据成功~");
+  };
+
   render() {
     const { chapters } = this.props;
-    const { expandedRowKeys, isShowVideoModal, lesson } = this.state;
+    const {
+      expandedRowKeys,
+      isShowVideoModal,
+      lesson,
+      selectedRowKeys,
+    } = this.state;
 
     const columns = [
       {
@@ -145,9 +190,11 @@ class List extends Component {
           <div>
             <Button type="primary">
               <PlusOutlined />
-              新增课程
+              新增章节
             </Button>
-            <Button type="danger">批量删除</Button>
+            <Button type="danger" onClick={this.batchRemove}>
+              批量删除
+            </Button>
             <Tooltip title="全屏">
               <FullscreenOutlined />
             </Tooltip>
@@ -159,10 +206,18 @@ class List extends Component {
             </Tooltip>
           </div>
         </div>
-        <Alert message="已选择 0 项" type="info" showIcon />
+        <Alert
+          message={`已选择 ${selectedRowKeys.length} 项`}
+          type="info"
+          showIcon
+        />
         <Table
           className="chapter-list-table"
           columns={columns} // 决定列头
+          rowSelection={{
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+          }}
           expandable={{
             // 内部默认会使用children作为展开的子菜单
             // 也就是说，如果要展开的数据有children属性，才会有展开图标，就会作为子菜单展开~

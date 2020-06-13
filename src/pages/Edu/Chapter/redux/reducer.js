@@ -2,6 +2,7 @@ import {
   GET_ALL_COURSE_LIST,
   GET_CHAPTER_LIST,
   GET_LESSON_LIST,
+  BATCH_REMOVE_LESSON_LIST,
 } from "./constants";
 
 const initChapter = {
@@ -46,6 +47,27 @@ export default function chapter(prevState = initChapter, action) {
               };
             }
             return chapter;
+          }),
+        },
+      };
+    case BATCH_REMOVE_LESSON_LIST:
+      return {
+        ...prevState,
+        chapters: {
+          total: prevState.chapters.total,
+          items: prevState.chapters.items.map((chapter) => {
+            // 找到要更新章节数据并更新
+            let children = chapter.children;
+            if (children && children.length) {
+              // 过滤要删除的课时id
+              children = children.filter(
+                (item) => action.data.indexOf(item._id) === -1
+              );
+            }
+            return {
+              ...chapter,
+              children,
+            };
           }),
         },
       };

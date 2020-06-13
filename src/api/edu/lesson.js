@@ -24,3 +24,14 @@ export function reqAddLesson({ chapterId, title, free, video }) {
     },
   });
 }
+
+// 批量删除课时列表
+export function reqBatchRemoveLessonList(idList) {
+  return request({
+    url: `${BASE_URL}/batchRemove`,
+    method: "DELETE",
+    data: {
+      idList,
+    },
+  });
+}
