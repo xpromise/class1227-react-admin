@@ -16,21 +16,21 @@ import Layout from "./layouts";
 import "./assets/css/reset.css";
 
 function App({ language }) {
-  const messages = language === "en" ? en : zh; // 自定义的方案
-  const locale = language === "en" ? enUS : zhCN; // antd的方案
+	const messages = language === "en" ? en : zh; // 自定义的方案
+	const locale = language === "en" ? enUS : zhCN; // antd的方案
 
-  return (
-    <Router history={history}>
-      <ConfigProvider locale={locale}>
-        <IntlProvider
-          locale={language} // 当前语言环境
-          messages={messages} // 加载使用的语言包
-        >
-          <Layout />
-        </IntlProvider>
-      </ConfigProvider>
-    </Router>
-  );
+	return (
+		<Router history={history}>
+			<ConfigProvider locale={locale}>
+				<IntlProvider
+					locale={language} // 当前语言环境
+					messages={messages} // 加载使用的语言包
+				>
+					<Layout />
+				</IntlProvider>
+			</ConfigProvider>
+		</Router>
+	);
 }
 
 export default connect((state) => ({ language: state.language }))(App);
