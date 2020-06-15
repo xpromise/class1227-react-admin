@@ -14,6 +14,8 @@ export const getCourseList = ({
   subjectId,
   subjectParentId,
   title,
+  sortBy,
+  sort,
 }) => {
   return (dispatch) => {
     return reqGetCourseList({
@@ -23,6 +25,8 @@ export const getCourseList = ({
       subjectId,
       subjectParentId,
       title,
+      sortBy,
+      sort,
     }).then((response) => {
       dispatch(getCourseListSync(response));
       return response;

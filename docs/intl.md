@@ -16,3 +16,8 @@
   const intl = useIntl();
   intl.formatMessage({ id: 要使用语言包的属性, defaultMessage: 默认值 });
   ```
+
+3. 使用
+- 定义语言包 - json  
+- 我们定义的数据：使用FormattedMessage组件来实现国际化
+- antd定义的数据：
