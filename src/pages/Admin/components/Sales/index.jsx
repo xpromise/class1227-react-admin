@@ -129,7 +129,7 @@ export default class Sales extends Component {
 
 		return (
 			<Card
-				style={{ width: "100%" }}
+				style={{ width: "100%", marginBottom: 20 }}
 				tabList={tabList} // Tab左侧显示的内容
 				activeTabKey={tabKey} // 选中的Tab
 				tabBarExtraContent={extra} // Tab右边显示的内容
