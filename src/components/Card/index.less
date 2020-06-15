@@ -1,21 +1,30 @@
+// 样式写法两种： .card .card-header 或 .card-header
+// 方案一：.card .card-header 优点是样式不容易出问题
+// 方案二：.card-header 代码少，解析速度快
+// CSS选择器：从右往左解析
 .card {
-  width: 100%;
+  border: 1px solid #f0f0f0;
   background-color: #fff;
-  padding: 12px 20px;
-  border-radius: 4px;
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    .card-icon {
-      cursor: pointer;
-    }
-  }
-  .card-content {
-    height: 50px;
-    display: flex;
-    align-items: flex-end;
-    > div {
-      width: 100%;
-    }
-  }
+  margin-bottom: 30px;
+  border-radius: 2px;
+  color: rgba(0, 0, 0, 0.65);
+  // width: 300px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  height: 80px;
+}
+
+.card-content {
+  padding: 0 20px;
+}
+
+.card-footer {
+  height: 30px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
 }
