@@ -84,7 +84,7 @@ export default class Sales extends Component {
 					break;
 			}
 
-			console.log(rangeTime);
+			// console.log(rangeTime);
 
 			this.setState({
 				datePicker,

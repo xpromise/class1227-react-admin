@@ -64,10 +64,10 @@ const barData = [
 ];
 
 const layout = {
-	xs: 24,
-	sm: 12,
-	md: 12,
-	lg: 6,
+	xs: 24, // 手机 / 超小屏幕
+	sm: 12, // 平板 / 小屏幕
+	md: 12, // pc电脑屏幕 / 中屏幕
+	lg: 6,  // pc电脑大屏幕  / 大屏幕
 };
 
 export default function Visits() {
