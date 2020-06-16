@@ -1,5 +1,5 @@
-import React from "react";
-import { Form, Tabs, Input, Button, Checkbox, Row, Col } from "antd";
+import React, { useState } from "react";
+import { Form, Tabs, Input, Button, Checkbox, Row, Col, message } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -11,7 +11,8 @@ import {
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
-import { login } from "@redux/actions/login";
+import { login, mobileLogin } from "@redux/actions/login";
+import { reqSendCode } from "@api/acl/oauth";
 
 import "./index.less";
 
@@ -19,6 +20,7 @@ const { TabPane } = Tabs;
 
 const reg = /^[a-zA-Z0-9_]+$/;
 
+//#region
 /*
   表单校验有三种写法：
     1. rules(如果多个表单校验规则一模一样)
@@ -47,6 +49,7 @@ const reg = /^[a-zA-Z0-9_]+$/;
       主要目的是为了复用 messages
 
 */
+//#endregion
 
 // 定义表单校验规则
 const rules = [
@@ -62,9 +65,23 @@ const rules = [
   },
 ];
 
-function LoginForm({ login, history }) {
+const TOTAL_TIME = 60;
+// 倒计时
+let countingDownTime = TOTAL_TIME;
+
+function LoginForm({ login, mobileLogin, history }) {
+  // Form表单提供form对象，对表单进行更加细致的操作
+  const [form] = Form.useForm();
+  // 只需要更新组件的方法，不需要数据
+  const [, setCountingDownTime] = useState(0);
+  // 是否已经发送验证码
+  const [isSendCode, setIsSendCode] = useState(false);
+
+  const [activeKey, setActiveKey] = useState("user");
+
+  // 处理tab点击的事件回调
   const handleTabChange = (key) => {
-    console.log(key);
+    setActiveKey(key);
   };
 
   // 一般不用第二种
@@ -107,29 +124,90 @@ function LoginForm({ login, history }) {
 
   // 点击表单提交按钮触发的方法
   const finish = async (values) => {
-    // 收集数据并进行表单校验
-    const { username, password, rem } = values;
-    // 发送请求，请求登录~
-    const token = await login(username, password);
-    // 请求失败 拦截器会自动报错
-    // 请求成功~
-    // rem 代表要不要记住密码
-    if (rem) {
-      // 持久化存储
-      localStorage.setItem("user_token", token);
+    if (activeKey === "user") {
+      form
+        .validateFields(["username", "password", "rem"])
+        .then(async (values) => {
+          // 用户名密码登录逻辑
+          const { username, password, rem } = values;
+          // 发送请求，请求登录~
+          const token = await login(username, password);
+          // 请求失败 拦截器会自动报错
+          // 请求成功~
+          // rem 代表要不要记住密码
+          if (rem) {
+            // 持久化存储
+            localStorage.setItem("user_token", token);
+          }
+          // 跳转到主页
+          history.replace("/");
+        });
+
+      return;
     }
-    // 跳转到主页
-    history.replace("/");
+
+    form.validateFields(["mobile", "code", "rem"]).then(async (values) => {
+      // 用户名密码登录逻辑
+      const { mobile, code, rem } = values;
+      // 发送请求，请求手机号登录~
+      const token = await mobileLogin(mobile, code);
+      // 请求失败 拦截器会自动报错
+      // 请求成功~
+      // rem 代表要不要记住密码
+      if (rem) {
+        // 持久化存储
+        localStorage.setItem("user_token", token);
+      }
+      // 跳转到主页
+      history.replace("/");
+    });
+  };
+
+  const countingDown = () => {
+    // 内部会缓存state结果。导致更新失败
+    const timer = setInterval(() => {
+      // 更新倒计时
+      countingDownTime--;
+      if (countingDownTime <= 0) {
+        // 清除定时器
+        clearInterval(timer);
+        countingDownTime = TOTAL_TIME;
+        setIsSendCode(false);
+        return;
+      }
+      // setCountingDownTime目的为了重新渲染组件，数据更新不更新无所谓
+      setCountingDownTime(countingDownTime);
+    }, 1000);
+  };
+
+  // 点击发送验证码
+  const sendCode = () => {
+    // 判断用户有没有输入手机号 并且 要合法
+    // 手动触发表单校验规则
+    form
+      .validateFields(["mobile"])
+      .then(async ({ mobile }) => {
+        // 发送请求，获取验证码~
+        await reqSendCode(mobile);
+        // 发送成功~
+        setIsSendCode(true); // 代表已经发送过验证码
+        countingDown();
+        message.success("验证码发送成功~");
+      })
+      .catch((err) => {
+        // 页面已经有提示了
+      });
   };
 
   return (
     <Form
+      form={form}
       validateMessages={validateMessages}
       initialValues={{ rem: "checked" }}
       // 注意button按钮的类型必须submit
-      onFinish={finish}
+      // onFinish={finish} // 问题会校验所有表单。
     >
-      <Tabs onChange={handleTabChange}>
+      <Tabs activeKey={activeKey} onChange={handleTabChange}>
         <TabPane tab="账户密码登录" key="user">
           <Form.Item
             name="username"
@@ -173,9 +251,9 @@ function LoginForm({ login, history }) {
             />
           </Form.Item>
         </TabPane>
-        <TabPane tab="手机号登录" key="phone">
+        <TabPane tab="手机号登录" key="mobile">
           <Form.Item
-            name="phone"
+            name="mobile"
             // 表单校验规则
             rules={[
               { required: true, message: "请输入手机号" },
@@ -188,21 +266,35 @@ function LoginForm({ login, history }) {
             <Input prefix={<MobileOutlined />} placeholder="手机号" />
           </Form.Item>
 
-          <Form.Item
-            name="password"
-            // 表单校验规则
-            rules={[
-              {
-                required: true,
-                message: "请输入验证码",
-              },
-            ]}
-          >
-            <div className="login-form-phone">
-              <Input placeholder="验证码" />
-              <Button>点击发送验证码</Button>
-            </div>
-          </Form.Item>
+          <Row justify="space-between">
+            <Col>
+              <Form.Item
+                name="code"
+                // 表单校验规则
+                rules={[
+                  {
+                    required: true,
+                    message: "请输入验证码",
+                  },
+                  {
+                    pattern: /^[0-9]{6}$/,
+                    message: "请输入正确的验证码",
+                  },
+                ]}
+              >
+                <Input placeholder="验证码" />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item>
+                <Button onClick={sendCode} disabled={isSendCode}>
+                  {isSendCode
+                    ? `${countingDownTime}秒后可重发`
+                    : "点击发送验证码"}
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
         </TabPane>
       </Tabs>
       {/* 默认接管组件value属性，但是现在需要修改的checked  */}
@@ -219,7 +311,7 @@ function LoginForm({ login, history }) {
         </Col>
       </Row>
       <Form.Item>
-        <Button type="primary" htmlType="submit" className="login-form-btn">
+        <Button type="primary" onClick={finish} className="login-form-btn">
           登录
         </Button>
       </Form.Item>
@@ -244,4 +336,4 @@ function LoginForm({ login, history }) {
   );
 }
 
-export default withRouter(connect(null, { login })(LoginForm));
+export default withRouter(connect(null, { login, mobileLogin })(LoginForm));
