@@ -8,6 +8,11 @@ import {
   WechatOutlined,
   QqOutlined,
 } from "@ant-design/icons";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+
+import { login } from "@redux/actions/login";
+
 import "./index.less";
 
 const { TabPane } = Tabs;
@@ -57,7 +62,7 @@ const rules = [
   },
 ];
 
-export default function LoginForm() {
+function LoginForm({ login, history }) {
   const handleTabChange = (key) => {
     console.log(key);
   };
@@ -100,10 +105,29 @@ export default function LoginForm() {
     // },
   };
 
+  // 点击表单提交按钮触发的方法
+  const finish = async (values) => {
+    // 收集数据并进行表单校验
+    const { username, password, rem } = values;
+    // 发送请求，请求登录~
+    const token = await login(username, password);
+    // 请求失败 拦截器会自动报错
+    // 请求成功~
+    // rem 代表要不要记住密码
+    if (rem) {
+      // 持久化存储
+      localStorage.setItem("user_token", token);
+    }
+    // 跳转到主页
+    history.replace("/");
+  };
+
   return (
     <Form
       validateMessages={validateMessages}
-      initialValues={{ rem: { checked: true } }}
+      initialValues={{ rem: "checked" }}
+      // 注意button按钮的类型必须submit
+      onFinish={finish}
     >
       <Tabs onChange={handleTabChange}>
         <TabPane tab="账户密码登录" key="user">
@@ -195,7 +219,7 @@ export default function LoginForm() {
         </Col>
       </Row>
       <Form.Item>
-        <Button type="primary" className="login-form-btn">
+        <Button type="primary" htmlType="submit" className="login-form-btn">
           登录
         </Button>
       </Form.Item>
@@ -204,9 +228,9 @@ export default function LoginForm() {
           <Form.Item>
             <div className="login-form-icons">
               <span>其他登录方式</span>
-              <GithubOutlined className="icons"/>
-              <WechatOutlined className="icons"/>
-              <QqOutlined className="icons"/>
+              <GithubOutlined className="icons" />
+              <WechatOutlined className="icons" />
+              <QqOutlined className="icons" />
             </div>
           </Form.Item>
         </Col>
@@ -219,3 +243,5 @@ export default function LoginForm() {
     </Form>
   );
 }
+
+export default withRouter(connect(null, { login })(LoginForm));

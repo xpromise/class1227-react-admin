@@ -1,38 +1,26 @@
-import { reqLogin, reqLogout } from "@api/acl/login";
-import { LOGIN_SUCCESS, REMOVE_TOKEN } from "../constants/login";
+import { reqLogin } from "@api/acl/login";
 
-/**
- * 登陆
- */
-const loginSuccessSync = user => ({
-  type: LOGIN_SUCCESS,
-  data: user
-});
+import { LOGIN, LOGOUT } from "../constants/login";
 
+// 账户名密码登录
 export const login = (username, password) => {
-  return dispatch => {
-    return reqLogin(username, password).then(response => {
-      dispatch(loginSuccessSync(response));
-      // 返回token，外面才能接受
-      return response.token;
+  return (dispatch) => {
+    // 执行异步代码~
+    return reqLogin(username, password).then(({ token }) => {
+      dispatch(loginSync(token));
+      return token;
     });
   };
 };
 
-/**
- * 删除token
- */
-export const removeToken = () => ({
-  type: REMOVE_TOKEN
+const loginSync = (token) => ({
+  type: LOGIN,
+  data: token,
 });
 
-/**
- * 登出
- */
-export const logout = () => {
-  return dispatch => {
-    return reqLogout().then(() => {
-      dispatch(removeToken());
-    });
-  };
-};
+// 登出
+export const logout = () => ({
+  type: LOGOUT,
+});
+
+export const removeToken = () => {};

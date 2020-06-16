@@ -21,7 +21,7 @@ export function getInfo() {
 export function reqLogin(username, password) {
   return request({
     url: `${BASE_URL}/login`,
-    method: "post",
+    method: "POST",
     data: {
       username,
       password,
