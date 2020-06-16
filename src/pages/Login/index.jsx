@@ -1,31 +1,30 @@
-import React from "react";
+import React, { Component } from "react";
 import { CopyrightOutlined } from "@ant-design/icons";
-
-import logo from "@assets/images/logo.png";
-import LoginForm from "./LoginForm";
+import LoginForm from "./components/LoginForm";
 
 import "./index.less";
+import logo from "@assets/images/logo.png";
 
-export default function Login() {
-  return (
-    <div className="login">
-      <div>
-        <div className="login-header">
-          <img src={logo} alt="logo" />
-          <h1>硅谷教育管理系统</h1>
-        </div>
-        <div className="login-form">
-          <LoginForm></LoginForm>
-        </div>
-        <div className="login-footer">
-          <span>尚硅谷</span>
-          <span>
-            Copyright
-            <CopyrightOutlined className="copyright" />
-            2020 硅谷前端技术部出品
-          </span>
+export default class Login extends Component {
+  render() {
+    return (
+      <div className="login">
+        <div className="login-container">
+          <div className="login-header">
+            <img src={logo} alt="logo" />
+            <h1>硅谷教育管理系统</h1>
+          </div>
+          <div className="login-content">
+            <LoginForm />
+          </div>
+          <div className="login-footer">
+            <span>尚硅谷</span>
+            <span>
+              Copyright <CopyrightOutlined /> 2020尚硅谷前端技术部出品
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
