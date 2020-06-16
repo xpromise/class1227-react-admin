@@ -1,6 +1,13 @@
 import React from "react";
-import { Form, Tabs, Input } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Form, Tabs, Input, Button, Checkbox, Row, Col } from "antd";
+import {
+  UserOutlined,
+  LockOutlined,
+  MobileOutlined,
+  GithubOutlined,
+  WechatOutlined,
+  QqOutlined,
+} from "@ant-design/icons";
 import "./index.less";
 
 const { TabPane } = Tabs;
@@ -94,57 +101,121 @@ export default function LoginForm() {
   };
 
   return (
-    <Form validateMessages={validateMessages}>
-      <div className="login-form-header">
-        <Tabs onChange={handleTabChange}>
-          <TabPane tab="账户密码登录" key="user">
-            <Form.Item
-              name="username"
-              // 表单校验规则
-              // rules={[
-              //   { required: true, message: "请输入用户名" },
-              //   { max: 15, message: "输入的长度不能超过15位" },
-              //   { min: 4, message: "输入的长度不能小于4位" },
-              //   {
-              //     pattern: /^[a-zA-Z0-9_]+$/,
-              //     message: "输入内容只能包含数字、英文和下划线",
-              //   },
-              // ]}
-              // rules={[
-              //   {
-              //     required: true,
-              //   },
-              // ]}
-              rules={rules}
-            >
-              <Input prefix={<UserOutlined />} placeholder="用户名: admin" />
-            </Form.Item>
+    <Form
+      validateMessages={validateMessages}
+      initialValues={{ rem: { checked: true } }}
+    >
+      <Tabs onChange={handleTabChange}>
+        <TabPane tab="账户密码登录" key="user">
+          <Form.Item
+            name="username"
+            // 表单校验规则
+            // rules={[
+            //   { required: true, message: "请输入用户名" },
+            //   { max: 15, message: "输入的长度不能超过15位" },
+            //   { min: 4, message: "输入的长度不能小于4位" },
+            //   {
+            //     pattern: /^[a-zA-Z0-9_]+$/,
+            //     message: "输入内容只能包含数字、英文和下划线",
+            //   },
+            // ]}
+            // rules={[
+            //   {
+            //     required: true,
+            //   },
+            // ]}
+            rules={rules}
+          >
+            <Input prefix={<UserOutlined />} placeholder="用户名: admin" />
+          </Form.Item>
 
-            <Form.Item
-              name="password"
-              // 表单校验规则
-              // rules={[
-              //   { validator: validator }, // 自定义规则
-              // ]}
-              // rules={[
-              //   {
-              //     required: true,
-              //   },
-              // ]}
-              rules={rules}
-            >
-              <Input
-                type="password"
-                prefix={<UserOutlined />}
-                placeholder="用户名: admin"
-              />
-            </Form.Item>
-          </TabPane>
-          <TabPane tab="手机号登录" key="phone">
-            Content of Tab Pane 2
-          </TabPane>
-        </Tabs>
-      </div>
+          <Form.Item
+            name="password"
+            // 表单校验规则
+            // rules={[
+            //   { validator: validator }, // 自定义规则
+            // ]}
+            // rules={[
+            //   {
+            //     required: true,
+            //   },
+            // ]}
+            rules={rules}
+          >
+            <Input
+              type="password"
+              prefix={<LockOutlined />}
+              placeholder="密码: 111111"
+            />
+          </Form.Item>
+        </TabPane>
+        <TabPane tab="手机号登录" key="phone">
+          <Form.Item
+            name="phone"
+            // 表单校验规则
+            rules={[
+              { required: true, message: "请输入手机号" },
+              {
+                pattern: /^(((13[0-9])|(14[579])|(15([0-3]|[5-9]))|(16[6])|(17[0135678])|(18[0-9])|(19[89]))\d{8})$/,
+                message: "请输入正确的手机号",
+              },
+            ]}
+          >
+            <Input prefix={<MobileOutlined />} placeholder="手机号" />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            // 表单校验规则
+            rules={[
+              {
+                required: true,
+                message: "请输入验证码",
+              },
+            ]}
+          >
+            <div className="login-form-phone">
+              <Input placeholder="验证码" />
+              <Button>点击发送验证码</Button>
+            </div>
+          </Form.Item>
+        </TabPane>
+      </Tabs>
+      {/* 默认接管组件value属性，但是现在需要修改的checked  */}
+      <Row justify="space-between">
+        <Col>
+          <Form.Item name="rem" valuePropName="checked">
+            <Checkbox>记住密码</Checkbox>
+          </Form.Item>
+        </Col>
+        <Col>
+          <Form.Item>
+            <Button type="link">忘记密码</Button>
+          </Form.Item>
+        </Col>
+      </Row>
+      <Form.Item>
+        <Button type="primary" className="login-form-btn">
+          登录
+        </Button>
+      </Form.Item>
+      <Row justify="space-between">
+        <Col>
+          <Form.Item>
+            <div className="login-form-icons">
+              <span>其他登录方式</span>
+              <GithubOutlined className="icons"/>
+              <WechatOutlined className="icons"/>
+              <QqOutlined className="icons"/>
+            </div>
+          </Form.Item>
+        </Col>
+        <Col>
+          <Form.Item>
+            <Button type="link">注册</Button>
+          </Form.Item>
+        </Col>
+      </Row>
     </Form>
   );
 }
