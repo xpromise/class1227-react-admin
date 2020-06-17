@@ -25,7 +25,7 @@ export const login = (username, password) => {
   };
 };
 
-const loginSync = (token) => ({
+export const loginSync = (token) => ({
   type: LOGIN,
   data: token,
 });

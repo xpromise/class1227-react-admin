@@ -13,6 +13,7 @@ import { withRouter } from "react-router-dom";
 
 import { login, mobileLogin } from "@redux/actions/login";
 import { reqSendCode } from "@api/acl/oauth";
+import { CLIENT_ID } from "@conf/oauth";
 
 import "./index.less";
 
@@ -199,6 +200,20 @@ function LoginForm({ login, mobileLogin, history }) {
       });
   };
 
+  // oauth登录第一步：跳转到github授权地址
+  const goGithub = () => {
+    /*
+      地址 https://github.com/login/oauth/authorize
+      参数
+        client_id 
+      可能要注册成功，要等半天左右时间才能生效
+        Client ID ba6e49e04ddda1b425ed
+        Client Secret a00d71816a3fdb62af99de658fb9a893426bc95d
+      注意：要保证客户端和服务器一致~  
+    */
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}`;
+  };
+
   return (
     <Form
       form={form}
@@ -320,7 +335,7 @@ function LoginForm({ login, mobileLogin, history }) {
           <Form.Item>
             <div className="login-form-icons">
               <span>其他登录方式</span>
-              <GithubOutlined className="icons" />
+              <GithubOutlined className="icons" onClick={goGithub} />
               <WechatOutlined className="icons" />
               <QqOutlined className="icons" />
             </div>
