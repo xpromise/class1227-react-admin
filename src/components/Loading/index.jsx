@@ -11,6 +11,7 @@ class Loading extends Component {
     const { loading } = this.props;
 
     if (loading) {
+      // loading
       return (
         <div className="loading" style={{ display: loading ? "flex" : "none" }}>
           <h1>
@@ -22,7 +23,7 @@ class Loading extends Component {
         </div>
       );
     }
-
+    // 渲染子组件
     return this.props.children;
   }
 }

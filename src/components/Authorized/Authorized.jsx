@@ -21,18 +21,22 @@ class Authorized extends Component {
       getAccessRoutes,
       updateLoading,
     } = this.props;
-    
+
     const promises = [];
 
     if (!roles.length) {
+      // 请求用户数据
       promises.push(getUserInfo());
     }
 
     if (!permissionList.length) {
+      // 请求权限数据
       promises.push(getAccessRoutes());
     }
 
     Promise.all(promises).finally(() => {
+      // 更新 loading 为false
+      // 一旦 loading 为fasle，就会加载 PrimaryLayout
       updateLoading(false);
     });
   }
@@ -43,7 +47,15 @@ class Authorized extends Component {
       render,
     } = this.props;
 
-    return <Loading>{render(permissionList)}</Loading>;
+    return (
+      <Loading>
+        {
+          // render方法调用的返回值就是 PrimaryLayout
+          // 一上来loading是true，不会渲染~
+          render(permissionList)
+        }
+      </Loading>
+    );
   }
 }
 

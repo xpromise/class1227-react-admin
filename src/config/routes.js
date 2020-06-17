@@ -191,6 +191,7 @@ import NotFound from "@pages/404";
 ]; */
 //#endregion
 
+// 公开路由，不用登陆即可访问
 // 常量路由（不用权限管理，任何用户都可以访问）
 export const constantRoutes = [
   {

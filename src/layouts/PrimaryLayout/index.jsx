@@ -178,6 +178,7 @@ class PrimaryLayout extends Component {
 
     return (
       <Layout className="layout">
+        {/* 左侧导航 */}
         <Sider trigger={null} collapsible collapsed={collapsed}>
           <div className="logo">
             <img src={logo} alt="logo" />
@@ -187,7 +188,9 @@ class PrimaryLayout extends Component {
           </div>
           <SiderMenu routes={routes} defaultOpenKey={route && route.path} />
         </Sider>
+        {/* 右边主体内容 */}
         <Layout className="site-layout">
+          {/* 右边标题 */}
           <Header className="site-layout-header">
             <span className="site-layout-container">
               {React.createElement(
@@ -212,6 +215,7 @@ class PrimaryLayout extends Component {
               </span>
             </span>
           </Header>
+          {/* 右边内容 */}
           <Content className="site-layout-background">
             <div className="site-layout-header-wrap">
               {this.renderBreadcrumb(route)}
