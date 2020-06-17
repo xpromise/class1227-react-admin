@@ -82,3 +82,23 @@
 - 后面流程就基本一致了~
 
 ## oauth2.0 授权登录（第三方应用授权登录）
+
+1. 点击 github 图标跳转网址
+
+- 地址 https://github.com/login/oauth/authorize
+- 参数 client_id
+
+2. 授权流程
+
+- 填写用户名和密码（如果之前登录过 github，这步就会跳过）
+- 确认授权（将 github 权限授权给当前硅谷系统）
+
+3. 接受授权成功/登录成功返回的 token
+
+- 自动跳转到 http://localhost:3000/oauth 地址，并携带参数 token
+- 定义 Oauth 组件来接受处理 token
+  - 定义 Oauth 组件
+  - config/routes 在常量路由配置中加入 Oauth 组件配置
+  - Oauth 组件内定义componentDidMount --> 通过 location.search 获取token
+  - 将其存储到 redux 和 localStorage 中
+  - 跳转到首页
