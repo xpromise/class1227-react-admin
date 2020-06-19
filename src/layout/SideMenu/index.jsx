@@ -56,7 +56,7 @@ const { SubMenu } = Menu;
   ]
 */
 
-@withRouter
+// @withRouter
 @connect((state) => ({
   permissionList: state.user.permissionList,
 }))
@@ -136,14 +136,20 @@ class SideMenu extends Component {
   render() {
     const {
       permissionList,
-      location: { pathname }, // 对location解构赋值
+      // location: { pathname }, // 对location解构赋值
+      currentRoute,
     } = this.props;
 
     return (
       <Menu
         theme="dark"
-        defaultSelectedKeys={[pathname]} // 默认选中的菜单（值是数组）
-        defaultOpenKeys={this.getOpenKeys(pathname)} // 默认展开菜单（值是数组）
+        defaultSelectedKeys={[
+          currentRoute.children
+            ? currentRoute.path + currentRoute.children.path // 二级菜单
+            : currentRoute.path, // 一级菜单
+        ]} // 默认选中的菜单（值是数组）
+        // defaultOpenKeys={this.getOpenKeys(pathname)} // 默认展开菜单（值是数组）
+        defaultOpenKeys={[currentRoute.path]} // 不管是一级还是二级，要展开的是父级菜单
         mode="inline"
       >
         {/* 私有路由：默认可以访问的首页 */}
