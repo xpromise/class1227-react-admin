@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Menu } from "antd";
 
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import icons from "@conf/icons";
 
 import { defaultRoutes } from "@conf/routes";
@@ -56,6 +56,7 @@ const { SubMenu } = Menu;
   ]
 */
 
+@withRouter
 @connect((state) => ({
   permissionList: state.user.permissionList,
 }))
@@ -107,11 +108,44 @@ class SideMenu extends Component {
     });
   };
 
+  // 获取展开菜单的key
+  // 注意：返回值是数组
+  getOpenKeys = (pathname) => {
+    if (pathname === "/") return [];
+
+    /* //  "/" 重复的次数
+    let repeat = 0;
+    // 展开的key
+    let openKey = "";
+
+    for (let i = 0; i < pathname.length; i++) {
+      const item = pathname[i];
+      if (item === "/") {
+        repeat++;
+      }
+      // 第二次出现
+      if (repeat === 2) {
+        return [openKey];
+      }
+      // 拼串
+      openKey += item;
+    } */
+    return ["/" + pathname.split("/")[1]];
+  };
+
   render() {
-    const { permissionList } = this.props;
+    const {
+      permissionList,
+      location: { pathname }, // 对location解构赋值
+    } = this.props;
 
     return (
-      <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+      <Menu
+        theme="dark"
+        defaultSelectedKeys={[pathname]} // 默认选中的菜单（值是数组）
+        defaultOpenKeys={this.getOpenKeys(pathname)} // 默认展开菜单（值是数组）
+        mode="inline"
+      >
         {/* 私有路由：默认可以访问的首页 */}
         {this.renderMenu(defaultRoutes)}
         {/* 私有路由：通过后台数据动态生成 */}
