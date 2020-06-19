@@ -3,14 +3,14 @@ import request from "@utils/request";
 const BASE_URL = "/admin/acl/index";
 
 // 获取菜单权限数据
-export function getMenu() {
+export function reqGetMenu() {
   return request({
     url: `${BASE_URL}/menu`,
     method: "GET",
   });
 }
 
-export function getInfo() {
+export function reqGetUserInfo() {
   return request({
     url: `${BASE_URL}/info`,
     method: "GET",

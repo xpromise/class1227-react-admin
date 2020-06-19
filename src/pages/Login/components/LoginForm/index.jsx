@@ -19,7 +19,7 @@ import "./index.less";
 
 const { TabPane } = Tabs;
 
-const reg = /^[a-zA-Z0-9_]+$/;
+// const reg = /^[a-zA-Z0-9_]+$/;
 
 //#region
 /*
@@ -86,7 +86,7 @@ function LoginForm({ login, mobileLogin, history }) {
   };
 
   // 一般不用第二种
-  const validator = (rule, value) => {
+  /* const validator = (rule, value) => {
     return new Promise((resolve, reject) => {
       // rule 里面有字段名
       // value 是输入的值
@@ -109,11 +109,12 @@ function LoginForm({ login, mobileLogin, history }) {
 
       resolve();
     });
-  };
+  }; */
 
   // 定义公共校验规则
   const validateMessages = {
-    required: "请输入${name}!",
+    /* eslint-disable-next-line */
+    required: "请输入 ${name}!",
     // types: {
     //   username: "${name} is not validate email!",
     //   password: "${name} is not a validate number!",

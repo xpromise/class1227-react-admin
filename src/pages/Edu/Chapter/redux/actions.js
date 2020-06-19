@@ -1,12 +1,12 @@
 import { reqGetAllCourseList } from "@api/edu/course";
-import { reqGetChapterList, reqBatchRemoveChapterList } from "@api/edu/chapter";
+import { reqGetChapterList } from "@api/edu/chapter";
 import { reqGetLessonList, reqBatchRemoveLessonList } from "@api/edu/lesson";
 
 import {
   GET_ALL_COURSE_LIST,
   GET_CHAPTER_LIST,
   GET_LESSON_LIST,
-  BATCH_REMOVE_LESSON_LIST
+  BATCH_REMOVE_LESSON_LIST,
 } from "./constants";
 /*
   请求所有课程数据

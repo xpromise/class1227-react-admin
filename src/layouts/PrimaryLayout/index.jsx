@@ -1,53 +1,41 @@
 import React, { Component } from "react";
-import { Layout, Menu, Dropdown, Breadcrumb, Button } from "antd";
+import { Layout, Breadcrumb, Menu, Dropdown, Button } from "antd";
 import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
   GlobalOutlined,
   UserOutlined,
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import { connect } from "react-redux";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
-import SiderMenu from "../SiderMenu";
-import { AuthorizedRouter } from "@comps/Authorized";
-import { logout } from "@redux/actions/login";
-import { resetUser } from "../../components/Authorized/redux";
-import logo from "@assets/images/logo.png";
-import { findPathIndex } from "@utils/tools";
 import { changeLanguageSync } from "@redux/actions/lang";
+import { logout } from "@redux/actions/login";
+import { resetUser } from "@comps/Authorized/redux";
+import { defaultRoutes } from "@conf/routes";
+import SideMenu from "../SideMenu";
+import { AuthorizedRouter } from "@comps/Authorized";
+import logo from "@assets/images/logo.png";
 
-// 引入组件公共样式
-import "@assets/css/common.less";
 import "./index.less";
 
-const { Header, Sider, Content } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 
-@connect(
-  (state) => ({
-    user: state.user,
-    language: state.language,
-  }),
-  {
-    logout,
-    resetUser,
-    changeLanguageSync,
-  }
-)
 @withRouter
+@connect((state) => ({ user: state.user, language: state.language }), {
+  logout,
+  resetUser,
+  changeLanguageSync,
+})
 class PrimaryLayout extends Component {
   state = {
     collapsed: false,
   };
 
-  toggle = () => {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    });
+  onCollapse = (collapsed) => {
+    this.setState({ collapsed });
   };
-
+  // 登出
   logout = ({ key }) => {
     if (key !== "2") return;
     this.props.logout().then(() => {
@@ -56,13 +44,13 @@ class PrimaryLayout extends Component {
       this.props.history.replace("/login");
     });
   };
-
+  // 选择语言
   clickLang = (lang) => {
     return () => {
       this.props.changeLanguageSync(lang);
     };
   };
-
+  // 个人菜单
   menu = (
     <Menu style={{ width: 150 }} onClick={this.logout}>
       <Menu.Item key="0">
@@ -85,31 +73,33 @@ class PrimaryLayout extends Component {
     </Menu>
   );
 
-  selectRoute = (routes = [], pathname) => {
-    for (let i = 0; i < routes.length; i++) {
-      const route = routes[i];
+  // 获取当前路由配置
+  getCurrentRoute = (permissionList, pathname) => {
+    for (let i = 0; i < permissionList.length; i++) {
+      // 一级菜单
+      const route = permissionList[i];
+      // 找一级菜单
       if (route.path === pathname) {
-        return route;
+        return {
+          ...route,
+          children: undefined, // 目的：为了通过children来区分是一级菜单还是二级菜单
+        };
       }
-      const children = route.children;
 
+      const { children } = route;
+      // 找二级菜单
       if (children && children.length) {
         for (let j = 0; j < children.length; j++) {
+          // 二级菜单
           const item = children[j];
-          // 跳过4级菜单
-          if (!item.path) continue;
+          // 拼成二级菜单完整路径（父级菜单路径 + 子及菜单路径）
+          const currentPath = route.path + item.path;
 
-          let path = route.path + item.path;
-          /*
-            path: /acl/role/list
-              --> /acl/role
-            pathname: /acl/role/auth/xxx  
-          */
-          const index = findPathIndex(path, "/");
-          path = path.slice(0, index);
-          if (pathname.indexOf(path) !== -1) {
+          if (currentPath === pathname) {
             return {
+              // 一级菜单
               ...route,
+              // 二级菜单
               children: item,
             };
           }
@@ -118,37 +108,19 @@ class PrimaryLayout extends Component {
     }
   };
 
-  renderBreadcrumb = (route) => {
-    if (this.props.location.pathname === "/") {
-      return (
-        <Breadcrumb>
-          <Breadcrumb.Item>首页</Breadcrumb.Item>
-        </Breadcrumb>
-      );
-    }
-
-    if (!route) return;
-
-    return (
-      <Breadcrumb>
-        <Breadcrumb.Item>
-          <Link to="/">首页</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>{route.name}</Breadcrumb.Item>
-        <Breadcrumb.Item>{route.children.name}</Breadcrumb.Item>
-      </Breadcrumb>
-    );
-  };
-
   render() {
     const { collapsed } = this.state;
     const {
-      routes,
       user,
       location: { pathname },
     } = this.props;
 
-    const route = this.selectRoute(routes, pathname);
+    // 先找私有静态路由（前端）
+    let currentRoute = this.getCurrentRoute(defaultRoutes, pathname);
+    if (!currentRoute) {
+      // 再去找动态请求私有路由
+      currentRoute = this.getCurrentRoute(user.permissionList, pathname);
+    }
 
     const langMenu = (
       <Menu
@@ -179,52 +151,65 @@ class PrimaryLayout extends Component {
     return (
       <Layout className="layout">
         {/* 左侧导航 */}
-        <Sider trigger={null} collapsible collapsed={collapsed}>
-          <div className="logo">
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          // 收缩/展开侧边栏的方法
+          onCollapse={this.onCollapse}
+        >
+          <div className="layout-logo">
             <img src={logo} alt="logo" />
-            <h1 style={{ display: collapsed ? "none" : "block" }}>
-              硅谷教育管理系统
-            </h1>
+            {!collapsed && <h1>硅谷教育管理系统</h1>}
           </div>
-          <SiderMenu routes={routes} defaultOpenKey={route && route.path} />
+          <SideMenu currentRoute={currentRoute} />
         </Sider>
-        {/* 右边主体内容 */}
-        <Layout className="site-layout">
-          {/* 右边标题 */}
-          <Header className="site-layout-header">
-            <span className="site-layout-container">
-              {React.createElement(
-                collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-                {
-                  className: "trigger",
-                  onClick: this.toggle,
-                }
-              )}
-              <span className="site-layout-right">
-                <Dropdown overlay={this.menu}>
-                  <span className="site-layout-user">
-                    <img src={user.avatar} alt="avatar" />
-                    <span>{user.name}</span>
-                  </span>
-                </Dropdown>
-                <span className="site-layout-lang">
-                  <Dropdown overlay={langMenu}>
-                    <GlobalOutlined />
-                  </Dropdown>
-                </span>
-              </span>
+        {/* 右边布局 */}
+        <Layout>
+          {/* 右边头部 */}
+          <Header className="layout-header">
+            <img src={user.avatar} alt="avatar" />
+
+            <Dropdown overlay={this.menu}>
+              <span>{user.name}</span>
+            </Dropdown>
+
+            <span className="layout-header-lang">
+              <Dropdown overlay={langMenu}>
+                <GlobalOutlined />
+              </Dropdown>
             </span>
           </Header>
-          {/* 右边内容 */}
-          <Content className="site-layout-background">
-            <div className="site-layout-header-wrap">
-              {this.renderBreadcrumb(route)}
-              <h3>{route && route.children && route.children.name}</h3>
+          {/* 右边内容区 */}
+          <Content>
+            <div className="layout-nav">
+              {/* 如果是二级菜单，不要面包屑导航 */}
+              {currentRoute.children && (
+                <Breadcrumb>
+                  <Breadcrumb.Item>首页</Breadcrumb.Item>
+                  {/* 一级菜单名称 */}
+                  <Breadcrumb.Item>{currentRoute.name}</Breadcrumb.Item>
+                  {/* 二级菜单名称 */}
+                  <Breadcrumb.Item>
+                    {currentRoute.children.name}
+                  </Breadcrumb.Item>
+                </Breadcrumb>
+              )}
+              {/* 下面内容都需要 */}
+              <h3>
+                {currentRoute.children
+                  ? currentRoute.children.name
+                  : currentRoute.name}
+              </h3>
             </div>
-            <div className="site-layout-content-wrap">
-              <AuthorizedRouter routes={routes} />
+
+            <div className="layout-content">
+              <AuthorizedRouter permissionList={user.permissionList} />
             </div>
           </Content>
+          {/* 右边底部 */}
+          <Footer className="layout-footer">
+            ©2020课程版权均归硅谷教育管理系统所有
+          </Footer>
         </Layout>
       </Layout>
     );

@@ -1,33 +1,28 @@
 import React, { Component } from "react";
-
 import { connect } from "react-redux";
 
 import PrimaryLayout from "./PrimaryLayout";
+import { Authorized } from "@comps/Authorized";
 import PublicLayout from "./PublicLayout";
-import { Authorized } from "../components/Authorized";
 
 @connect((state) => ({ token: state.token }))
-class BasicLayout extends Component {
+class Layout extends Component {
   render() {
+    // 看是否登录 --> 看是否有token --> redux中看看
     const { token } = this.props;
 
-    if (token) {
-      // render props技术
-      // 提供一个B组件渲染到A组件内部，并传入props
-
-      // 所有用户数据和权限数据都在 Authorized 请求回来
-      // PrimaryLayout需要使用这些数据
-      return (
-        <Authorized
-          render={(routes) => {
-            return <PrimaryLayout routes={routes} />;
-          }}
-        />
-      );
-    }
-
-    return <PublicLayout />;
+    return token ? (
+      // 即要渲染子组件，也要传递属性数据
+      // 内部使用 this.props.render(routes)  render props
+      // <Authorized render={(routes) => <PrimaryLayout routes={routes}/>} />
+      // 只需要渲染子组件
+      <Authorized>
+        <PrimaryLayout />
+      </Authorized>
+    ) : (
+      <PublicLayout />
+    );
   }
 }
 
-export default BasicLayout;
+export default Layout;

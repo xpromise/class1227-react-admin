@@ -1,22 +1,22 @@
-import { UPDATE_USER, UPDATE_PERMISSION_LIST, RESET_USER } from "./constants";
+import { GET_USER_INFO, GET_MENU, RESET_USER } from "./constants";
 
 const initUser = {
-  roles: [], // 权限
   name: "", // 用户名
   avatar: "", // 头像
-  permissionValueList: [], // 按钮权限
-  permissionList: [], // 路由/菜单权限
+  permissionValueList: [], // 按钮权限列表
+
+  permissionList: [], // 路由权限列表
 };
 
 export default function user(prevState = initUser, action) {
   switch (action.type) {
-    case UPDATE_USER:
+    case GET_USER_INFO:
       return {
-        ...prevState,
+        ...prevState, // 展开之前的数据
+        // permissionList: prevState.permissionList,
         ...action.data,
-        permissionList: prevState.permissionList,
       };
-    case UPDATE_PERMISSION_LIST:
+    case GET_MENU:
       return {
         ...prevState,
         permissionList: action.data,

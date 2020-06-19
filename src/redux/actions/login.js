@@ -1,7 +1,7 @@
-import { reqLogin } from "@api/acl/login";
+import { reqLogin, reqLogout } from "@api/acl/login";
 import { reqMobileLogin } from "@api/acl/oauth";
 
-import { LOGIN, LOGOUT } from "../constants/login";
+import { LOGIN, REMOVE_TOKEN } from "../constants/login";
 
 // 手机号密码登录
 export const mobileLogin = (mobile, code) => {
@@ -31,8 +31,14 @@ export const loginSync = (token) => ({
 });
 
 // 登出
-export const logout = () => ({
-  type: LOGOUT,
-});
+export const logout = () => {
+  return (dispatch) => {
+    return reqLogout().then(() => {
+      dispatch(removeToken());
+    });
+  };
+};
 
-export const removeToken = () => {};
+export const removeToken = () => ({
+  type: REMOVE_TOKEN,
+});

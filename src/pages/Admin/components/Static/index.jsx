@@ -1,19 +1,11 @@
 import React, { Component } from "react";
 import { Tabs } from "antd";
 import {
-  G2,
   Chart,
   Geom,
   Axis,
   Tooltip,
-  Coord,
-  Label,
   Legend,
-  View,
-  Guide,
-  Shape,
-  Facet,
-  Util,
   RingProgressChart,
 } from "bizcharts";
 

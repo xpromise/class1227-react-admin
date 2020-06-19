@@ -1,61 +1,38 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
+import { getMenu, getUserinfo } from "./redux";
+
 import Loading from "../Loading";
-import { getAccessRoutes, getUserInfo } from "./redux";
-import { updateLoading } from "@redux/actions/loading";
 
-@connect(
-  (state) => ({
-    user: state.user,
-    loading: state.loading,
-  }),
-  { getAccessRoutes, getUserInfo, updateLoading }
-)
+@connect(null, { getMenu, getUserinfo })
+/*
+  请求用户数据+权限数据
+*/
 class Authorized extends Component {
+  state = {
+    isLoading: true,
+  };
+
   componentDidMount() {
-    // 发送请求，请求roles和permissionList
-    const {
-      user: { roles, permissionList },
-      getUserInfo,
-      getAccessRoutes,
-      updateLoading,
-    } = this.props;
+    // 请求用户数据+权限数据
+    const { getMenu, getUserinfo } = this.props;
 
-    const promises = [];
+    // 数据请求中显示loading，数据全部请求回来，显示PrimaryLayout组件
+    const promises = [getMenu(), getUserinfo()];
 
-    if (!roles.length) {
-      // 请求用户数据
-      promises.push(getUserInfo());
-    }
-
-    if (!permissionList.length) {
-      // 请求权限数据
-      promises.push(getAccessRoutes());
-    }
-
-    Promise.all(promises).finally(() => {
-      // 更新 loading 为false
-      // 一旦 loading 为fasle，就会加载 PrimaryLayout
-      updateLoading(false);
+    Promise.all(promises).then(() => {
+      // 数据全部请求回来了~
+      this.setState({
+        isLoading: false,
+      });
     });
   }
 
   render() {
-    const {
-      user: { permissionList },
-      render,
-    } = this.props;
+    const { isLoading } = this.state;
 
-    return (
-      <Loading>
-        {
-          // render方法调用的返回值就是 PrimaryLayout
-          // 一上来loading是true，不会渲染~
-          render(permissionList)
-        }
-      </Loading>
-    );
+    return isLoading ? <Loading /> : this.props.children;
   }
 }
 
