@@ -26,8 +26,8 @@ const getMenuSync = (permissionList) => ({
 export const getMenu = () => {
   return (dispatch) => {
     return reqGetMenu().then((response) => {
-      dispatch(getMenuSync(response.permissionList));
-      return response.permissionList;
+      dispatch(getMenuSync(response && response.permissionList));
+      return response && response.permissionList;
     });
   };
 };

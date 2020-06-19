@@ -113,6 +113,7 @@ axiosInstance.interceptors.response.use(
       const errorText = codeMessage[response.status] || response.statusText;
       const { status, url } = response;
 
+      // 权限管理：当你发送请求携带的token：过期/非法/伪造等，就会来到这里
       // 401说明token非法
       if (status === 401) {
         localStorage.removeItem("user_token");

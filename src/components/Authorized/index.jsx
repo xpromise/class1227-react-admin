@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 
 import { getMenu, getUserinfo } from "./redux";
 
-import PrimaryLayout from "../../layout/PrimaryLayout";
 import Loading from "../Loading";
 
 @connect(null, { getMenu, getUserinfo })
@@ -33,7 +32,7 @@ class Authorized extends Component {
   render() {
     const { isLoading } = this.state;
 
-    return isLoading ? <Loading /> : <PrimaryLayout />;
+    return isLoading ? <Loading /> : this.props.children;
   }
 }
 
