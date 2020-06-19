@@ -19,17 +19,17 @@ const NotFound = lazy(() => import(/* webpackChunkName: "404" */ "@pages/404"));
 // 公开路由表
 const constantRoutes = [
   {
-    title: "登录",
+    name: "登录",
     path: "/login",
     component: Login,
   },
   {
-    title: "授权登录",
+    name: "授权登录",
     path: "/oauth",
     component: Oauth,
   },
   {
-    title: "404",
+    name: "404",
     path: "*",
     component: NotFound,
   },
@@ -39,8 +39,9 @@ const constantRoutes = [
 const defaultRoutes = [
   {
     // 只要登录过就能访问首页
-    title: "首页",
+    name: "首页",
     path: "/",
+    icon: "home",
     component: "Admin",
   },
 ];
