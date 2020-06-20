@@ -12,11 +12,19 @@ import { connect } from "react-redux";
 
 import { getSubjectList, getSubSubjectList, updateSubject } from "./redux";
 import { reqDelSubject } from "@api/edu/subject";
+import { filterPermissions } from "@utils/tools";
 
 import "./index.less";
 
 @connect(
-  (state) => ({ subjectList: state.subjectList }), // 状态数据
+  (state) => ({
+    subjectList: state.subjectList,
+    permissionValueList: filterPermissions(
+      // 过滤不要权限值，返回一个对象
+      state.user.permissionValueList,
+      "subject"
+    ), // 按钮权限列表
+  }), // 状态数据
   {
     // 更新状态数据的方法
     getSubjectList,
@@ -177,7 +185,7 @@ class Subject extends Component {
   };
 
   render() {
-    const { subjectList } = this.props;
+    const { subjectList, permissionValueList } = this.props;
     const { expandedRowKeys, current, pageSize } = this.state;
 
     const columns = [
@@ -266,18 +274,20 @@ class Subject extends Component {
       },
     ];
 
-    console.log(subjectList);
+    console.log(permissionValueList);
 
     return (
       <div className="subject">
-        <Button
-          type="primary"
-          className="subject-btn"
-          onClick={this.showAddSubject}
-        >
-          <PlusOutlined />
-          新建
-        </Button>
+        {permissionValueList["subject.add"] && (
+          <Button
+            type="primary"
+            className="subject-btn"
+            onClick={this.showAddSubject}
+          >
+            <PlusOutlined />
+            新建
+          </Button>
+        )}
         <Table
           columns={columns} // 决定列头
           expandable={{

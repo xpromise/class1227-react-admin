@@ -145,7 +145,7 @@ class SideMenu extends Component {
         theme="dark"
         defaultSelectedKeys={[
           currentRoute.children
-            ? currentRoute.path + currentRoute.children.path // 二级菜单
+            ? currentRoute.children.path // 二级菜单
             : currentRoute.path, // 一级菜单
         ]} // 默认选中的菜单（值是数组）
         // defaultOpenKeys={this.getOpenKeys(pathname)} // 默认展开菜单（值是数组）

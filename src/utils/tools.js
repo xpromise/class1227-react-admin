@@ -19,10 +19,10 @@ export const findPathIndex = (path, keywords, times = 3) => {
 };
 
 export const filterPermissions = (permissions, key) => {
-  return permissions.reduce((roles, role) => {
-    if (role.indexOf(key) >= 0) {
-      roles[role] = true;
-    }
-    return roles;
-  }, {});
+  return permissions
+    .filter((value) => value.indexOf(key) !== -1)
+    .reduce((p, c) => {
+      p[c] = true;
+      return p;
+    }, {});
 };

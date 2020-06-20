@@ -7,6 +7,7 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import { connect } from "react-redux";
+import { matchPath } from "react-router";
 import { withRouter, Link } from "react-router-dom";
 
 import { changeLanguageSync } from "@redux/actions/lang";
@@ -92,15 +93,32 @@ class PrimaryLayout extends Component {
         for (let j = 0; j < children.length; j++) {
           // 二级菜单
           const item = children[j];
+
+          // 删除按钮是没有路径，不需要处理~
+          // 过滤删除按钮
+          if (!item.path) continue;
+
           // 拼成二级菜单完整路径（父级菜单路径 + 子及菜单路径）
           const currentPath = route.path + item.path;
 
-          if (currentPath === pathname) {
+          const currentRoute = {
+            ...item,
+            path: currentPath,
+          };
+          /*
+            currentPath acl/user/update/:id
+            pathname /acl/user/update/5ee9af3b08cbda2ab083f906
+          */
+          // matchPath(当前路由路径, 路由配置对象) 返回值是布尔值
+          // 代表当前路由路径有没有匹配上路由~
+          const match = matchPath(pathname, currentRoute);
+
+          if (match) {
             return {
               // 一级菜单
               ...route,
               // 二级菜单
-              children: item,
+              children: currentRoute,
             };
           }
         }
