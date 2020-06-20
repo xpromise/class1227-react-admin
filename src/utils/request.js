@@ -33,8 +33,14 @@ const CancelToken = axios.CancelToken;
 const cancelTokenMap = new Map();
 const CANCEL_REQUEST_MESSAGE = "cancel request";
 
+// 开发服务器地址
+const DEV_SERVER_URL = "";
+// 线上服务器地址
+const ONLINE_SERVER_URL = "http://47.103.203.152";
+
 const axiosInstance = axios.create({
-  baseURL: "", // 基础路径：所有请求的公共路径
+  baseURL:
+    process.env.NODE_ENV === "development" ? DEV_SERVER_URL : ONLINE_SERVER_URL, // 基础路径：所有请求的公共路径
   timeout: 10000, // 如果请求超过10s都没有响应结果，就自动中断请求
   headers: {
     // 公共的请求头参数
